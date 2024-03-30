@@ -19,4 +19,4 @@ In this paper I use econometric methods to analyze the net effect of electing mo
 
 ## [5] Emissions Database for Global Atmospheric Research (EDGAR) [https://edgar.jrc.ec.europa.eu/](https://edgar.jrc.ec.europa.eu/)
 
-## [6] GHG emissions of all world countries [https://edgar.jrc.ec.europa.eu/report_2023] (https://edgar.jrc.ec.europa.eu/report_2023)
+## [6] GHG emissions of all world countries [https://edgar.jrc.ec.europa.eu/report_2023](https://edgar.jrc.ec.europa.eu/report_2023)
