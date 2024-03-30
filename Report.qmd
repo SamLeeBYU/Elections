@@ -1,8 +1,101 @@
 ---
-title: "ECON 398 - Research Paper"
+title: "Women in Conflict"
+subtitle: "Do Women in Political Power Approach Conflict Differently?"
 author: "Sam Lee"
 format: pdf
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+
+library(tidyverse)
+library(patchwork)
+library(stargazer)
+library(haven)
+
+women <- read_dta("Data/womeninconflict.dta")
+```
+
+# Background
+
+```{r echo = F, warning=F, fig.width=8, fig.height=6}
+women.aggregate = women %>% group_by(region, year) %>%
+  mutate(
+    idp = mean(refugeesunderunhcrsmandate+idpsofconcerntounhcr, na.rm = T),
+    womeningov = mean((lowerwomen+upperwomen)/(lowerseats+upperseats), na.rm=T)
+  )
+  
+women.aggregate %>% ggplot(aes(x=year, y=idp, color=region))+
+  geom_line()+
+  geom_point()+
+  theme_minimal()+
+    labs(
+    x="Year",
+    y="Average Number of Internally Displaced Persons and Refugees"
+  )+
+  theme(legend.position = "top") +
+  labs(color = "Region")+
+  scale_y_continuous(labels = scales::number_format(scale = 1e6))
+
+women.aggregate %>% ggplot(aes(x=year, y=womeningov, color=region))+
+  geom_line()+
+  geom_point()+
+  theme_minimal()+
+  labs(
+    x="Year",
+    y="Average Proportion of Women in National Legislature"
+  )+
+  theme(legend.position = "top") +
+  labs(color = "Region")
+
+women.subset <- women %>%
+  mutate(
+    womeningov = (lowerwomen+upperwomen)/(lowerseats+upperseats)
+  ) %>% filter(
+    region %in% c("Sub-Saharan Africa", "Near East (Middle East and Northern Africa)")
+  )
+
+women.subset %>%
+  ggplot(aes(x=year, y=womeningov, group=countrycode, color=region))+
+    geom_line()+
+    theme(legend.position = "top") +
+    labs(color = "Region")+
+    theme_minimal()
+
+women.subset %>%
+  ggplot(aes(x=year, y=idpsofconcerntounhcr, group=countrycode, color=region))+
+    geom_line()+
+    geom_text(aes(label = countrycode, nudge_y = 0.1)) +
+    theme_minimal()+
+      labs(
+      x="Year",
+      y="IDP"
+    )+
+    theme(legend.position = "top") +
+    labs(color = "Region")+
+    scale_y_continuous(labels = scales::number_format(scale = 1e6))
+```
+
+```{r echo=F}
+women.subset = women %>% 
+  filter(region %in% c("Sub-Saharan Africa", "Near East (Middle East and Northern Africa)"))
+
+women.subset$womenrep = (women.subset$lowerwomen+women.subset$upperwomen)/(women.subset$lowerseats+women.subset$upperseats)
+women.subset$affected = women.subset$idpsofconcerntounhcr+women.subset$refugeesunderunhcrsmandate
+
+summary.stats <- tibble(
+  Variable = c("Affected Individuals", "Women Representation", "Country Population"),
+  Min = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, min, na.rm=T),3), scientific = F),
+  `1st Q.` = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, quantile, probs=0.25, na.rm=T),3), scientific = F),
+   Median = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, quantile, probs=0.5, na.rm=T),3), scientific = F),
+   Mean = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, mean, na.rm=T),3), scientific = F),
+  `3rd Q.` = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, quantile, probs=0.75, na.rm=T),3), scientific = F),
+    Max = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, max, na.rm=T),3), scientific = F)
+)
+
+summary.stats %>% 
+  knitr::kable() %>% kableExtra::kable_styling(font_size=10)
+```
 
 # Data
 

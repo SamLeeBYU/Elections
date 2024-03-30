@@ -15,7 +15,7 @@ from selenium.webdriver.chrome.service import Service
 
 def selenium_driver():
     
-    service = Service(ChromeDriverManager(driver_version="121.0.6167.189").install())
+    service = Service(ChromeDriverManager(driver_version="123.0.6312.60").install())
 
     options = Options()
     driver = webdriver.Chrome(service=service, options=options)
@@ -77,20 +77,24 @@ class Scraper():
             self._Data = pd.concat([self._Data, data]).reset_index(drop=True)
 
     def scrape_modern(self, date):
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.TAG_NAME, "table"))
-        )
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        table = soup.find('table')
-        data = pd.read_html(str(table))[0].iloc[2:, 1:]
-        data.columns = ["Country", "LowerElection", "LowerSeats", "LowerWomen", "LowerPercWomen", "UpperHouseSenate", "UpperSeats", "UpperWomen", "UpperPercWomen"]
-    
-        data["IPUUpdate"] = date
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.TAG_NAME, "table"))
+            )
+
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            table = soup.find('table')
+            data = pd.read_html(str(table))[0].iloc[1:, 1:]
+            data.columns = ["Country", "LowerElection", "LowerSeats", "LowerWomen", "LowerPercWomen", "UpperHouseSenate", "UpperSeats", "UpperWomen", "UpperPercWomen"]
         
-        if self._Data.empty:
-            self._Data = data
-        else:
-            self._Data = pd.concat([self._Data, data]).reset_index(drop=True)
+            data["IPUUpdate"] = date
+            
+            if self._Data.empty:
+                self._Data = data
+            else:
+                self._Data = pd.concat([self._Data, data]).reset_index(drop=True)
+        except Exception as error:
+            print("No new data to be scraped.")
 
     def save_data(self, dir="Data"):
         self._Data.to_csv(f"{dir}/IPU.csv", index=False)
