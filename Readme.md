@@ -5,7 +5,7 @@ author: "Sam Lee"
 
 # Introduction
 
-In this paper I use econometric methods to analyze the net effect of electing more women in national legislatures in African and Arab nations has on yearly $CO_2$ emissions per capita.
+In this paper I use econometric methods to analyze the net effect of electing more women in national legislatures in African and Arab nations on yearly $CO_2$ emissions per capita.
 
 # Data
 
