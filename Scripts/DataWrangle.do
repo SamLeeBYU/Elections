@@ -1,8 +1,36 @@
 /*
-Sam Lee - 03.29.2024
+Author: Sam Lee
+03.30.2024
 
 This script takes in all of our data sets and merges them into one cleaned data set for data analysis
 */
+
+//Load in suffrage data for each country to create instrument
+import delimited "Data/suffrage.csv", varnames(1) clear
+sort  countryn year
+
+//We need to figure out the first year that each country granted women suffrage
+//NOTE: This excludes countries that don't give women suffrage (as of 2019): UAE, Saudi Arabia
+// bysort countryn : egen suffrage = max(female_suffrage)
+// keep if suffrage == 0
+// keep countryn suffrage
+// duplicates drop
+
+keep if female_suffrage == 1
+//Find the first year where female_suffrage == 1
+bysort countryn : egen suffrage = min(year)
+keep countryn countrycode suffrage
+
+duplicates drop
+keep if length(countrycode) >= 1
+
+keep countrycode suffrage
+//There are some countries that split due to civil wars and other historic events: i.e. Vietnam into South Vietnam and North Vietnam;
+//Hence, these observations are given the same country code. We will keep the suffrage years of when the 'original' country first gave women suffrage.
+//NOTE: This is actually irrelevant to our study because within the countries identified in the Harvard dataverse data set, each country actually is given a unique country code and hence, we are able to map it uniquely to our final data set.
+collapse (min) suffrage, by(countrycode)
+
+save Data/suffrage.dta, replace
 
 //Data for CO2 emissions across African and Arab countries over time (EDGAR - Emissions Database for Global Atmospheric Research)
 import delimited "Data/emissions.csv", varnames(1) clear
@@ -132,6 +160,20 @@ keep if _merge == 3 | _merge == 1
 drop _merge
 
 sort countrycode year
+
+//Join suffrage data and create instrument
+merge m:1 countrycode using Data/suffrage.dta
+//These are countries that are not African or Arab
+drop if _merge == 2
+drop _merge
+
+//Instrument: years from when country granted suffrage
+gen z = year - suffrage
+
+drop if z == .
+//This drops Saudi Arabia and UAE:
+//Saudia Arabia only holds local elections (which women were enfranchised in 2015)
+//UAE doesn't grant universal suffrage for women (or anyone), and only recently held national elections in 2006, allowing a small number of voters to participate.
 
 //NOTE: The womenrep data for years 1985-1996 will be missing for every country since that data wasn't provided by the IPU. We keep these rows in here anyhow because we might want previous years to verify the parallel trends assumption.
 save Data/womenrep.dta, replace

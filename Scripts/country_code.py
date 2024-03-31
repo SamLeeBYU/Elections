@@ -15,14 +15,19 @@ def get_country_code(response, country_name):
         country_name = "Libya"
     if country_name == "Côte d'Ivoire" or country_name == "Cote d'Ivoire":
         country_name = "Ivory Coast"
-    if country_name == "Zaire":
+    if country_name == "Zaire" or country_name == "Congo Brazzaville":
         country_name = "Republic of the Congo"
-    if country_name == "Republic of Korea":
+    if country_name == "Republic of Korea" or country_name == "Korea, South":
         country_name = "South Korea"
     if country_name == "Syrian Arab Republic":
         country_name = "Syria"
-    if country_name == "Dem. Republic of the Congo" or country_name == "Democratic Republic of the Congo":
+    if country_name == "Dem. Republic of the Congo" or country_name == "Democratic Republic of the Congo" or country_name == "Congo, Democratic Republic":
         country_name = "DR Congo"
+    if country_name == "Swaziland":
+        country_name = "Eswatini"
+    if country_name == "Czech Republic":
+        country_name = "Czechia"
+    
 
     if response.status_code == 200:
 
@@ -62,4 +67,22 @@ if __name__ == "__main__":
     ipu_data = ipu_data.merge(code_df, on="Country", how="left")
 
     ipu_data.to_csv("Data/IPU.csv", index=False)
+
+    #Add in country codes for the suffrage data as well
+    suffrage = pd.read_csv("Data/suffrage.csv")
+    suffrage = suffrage[suffrage.columns[0:13]].copy()
+    codes = []
+    for country in list(set(suffrage["countryn"].values)):
+        code = get_country_code(response, country)
+        codes.append(code)
+    
+    code_df = pd.DataFrame({
+        "countryn": list(set(suffrage["countryn"].values)),
+        "countrycode": codes
+    })
+
+    suffrage = suffrage.merge(code_df, on="countryn", how="left")
+
+    suffrage.to_csv("Data/suffrage.csv", index=False)
+
     print("Data successfully updated.")

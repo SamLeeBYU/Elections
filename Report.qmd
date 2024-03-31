@@ -1,8 +1,13 @@
 ---
-title: "Women in Conflict"
-subtitle: "Do Women in Political Power Approach Conflict Differently?"
+title: "Closing the Gender Gap in Climate"
+subtitle: "Can Electing More Women into Office Narrow the Climate Divide?"
 author: "Sam Lee"
 format: pdf
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{Times New Roman}
+  - \usepackage{setspace}
+  - \renewcommand{\normalsize}{\fontsize{12}{14.4}\selectfont}
 ---
 
 ```{r setup, include=FALSE}
@@ -13,91 +18,35 @@ library(patchwork)
 library(stargazer)
 library(haven)
 
-women <- read_dta("Data/womeninconflict.dta")
+women <- read_dta("Data/womenrep.dta")
 ```
 
-# Background
+# Abstract
 
-```{r echo = F, warning=F, fig.width=8, fig.height=6}
-women.aggregate = women %>% group_by(region, year) %>%
-  mutate(
-    idp = mean(refugeesunderunhcrsmandate+idpsofconcerntounhcr, na.rm = T),
-    womeningov = mean((lowerwomen+upperwomen)/(lowerseats+upperseats), na.rm=T)
-  )
-  
-women.aggregate %>% ggplot(aes(x=year, y=idp, color=region))+
-  geom_line()+
-  geom_point()+
-  theme_minimal()+
-    labs(
-    x="Year",
-    y="Average Number of Internally Displaced Persons and Refugees"
-  )+
-  theme(legend.position = "top") +
-  labs(color = "Region")+
-  scale_y_continuous(labels = scales::number_format(scale = 1e6))
+In this paper, I seek to identify what the causal effect of electing higher proportions of women in national legislatures in African and Arab nations on yearly $CO_2$ per capita emissions. I utilize a fuzzy difference-in-difference approach on 64 different countries throughout Africa and the Middle-East. To eliminate the potential endogeneity in using the proportion of women in national legislature as a treatment on per capita $CO_2$ emissions, I use years since women were granted suffrage in the respective country as an instrumental variable. One nominal economic paper has shown evidence that increased women in parliaments is more than likely causally related to stricter climate policies (Mavisakalyan & Tarverdi, 2019). However, this paper fails to take into account how carbon emissions and women in government have evolved over time. In this paper, I expand on this research by showing directly how carbon emissions have changed over time to elicit a causal effect between changes in gender compositions at the national legislature level.
 
-women.aggregate %>% ggplot(aes(x=year, y=womeningov, color=region))+
-  geom_line()+
-  geom_point()+
-  theme_minimal()+
-  labs(
-    x="Year",
-    y="Average Proportion of Women in National Legislature"
-  )+
-  theme(legend.position = "top") +
-  labs(color = "Region")
+# Introduction
 
-women.subset <- women %>%
-  mutate(
-    womeningov = (lowerwomen+upperwomen)/(lowerseats+upperseats)
-  ) %>% filter(
-    region %in% c("Sub-Saharan Africa", "Near East (Middle East and Northern Africa)")
-  )
-
-women.subset %>%
-  ggplot(aes(x=year, y=womeningov, group=countrycode, color=region))+
-    geom_line()+
-    theme(legend.position = "top") +
-    labs(color = "Region")+
-    theme_minimal()
-
-women.subset %>%
-  ggplot(aes(x=year, y=idpsofconcerntounhcr, group=countrycode, color=region))+
-    geom_line()+
-    geom_text(aes(label = countrycode, nudge_y = 0.1)) +
-    theme_minimal()+
-      labs(
-      x="Year",
-      y="IDP"
-    )+
-    theme(legend.position = "top") +
-    labs(color = "Region")+
-    scale_y_continuous(labels = scales::number_format(scale = 1e6))
-```
-
-```{r echo=F}
-women.subset = women %>% 
-  filter(region %in% c("Sub-Saharan Africa", "Near East (Middle East and Northern Africa)"))
-
-women.subset$womenrep = (women.subset$lowerwomen+women.subset$upperwomen)/(women.subset$lowerseats+women.subset$upperseats)
-women.subset$affected = women.subset$idpsofconcerntounhcr+women.subset$refugeesunderunhcrsmandate
-
-summary.stats <- tibble(
-  Variable = c("Affected Individuals", "Women Representation", "Country Population"),
-  Min = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, min, na.rm=T),3), scientific = F),
-  `1st Q.` = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, quantile, probs=0.25, na.rm=T),3), scientific = F),
-   Median = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, quantile, probs=0.5, na.rm=T),3), scientific = F),
-   Mean = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, mean, na.rm=T),3), scientific = F),
-  `3rd Q.` = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, quantile, probs=0.75, na.rm=T),3), scientific = F),
-    Max = format(round(apply(cbind(women.subset$affected, women.subset$womenrep, women.subset$population), 2, max, na.rm=T),3), scientific = F)
-)
-
-summary.stats %>% 
-  knitr::kable() %>% kableExtra::kable_styling(font_size=10)
-```
+The current climate and economic research today overwhelmingly supports the thesis that women--especially in developing countries--are disproportionately affected by the negative externalities of climate change. During periods of increased droughts, which are exacerbated due to the effects of climate change, women often make long trips to meet agricultural, hygiene, and family needs. This has been linked to increased violence against women (UNDP, 2019). Increased risks of poverty, food insecurities have also been shown to increase as a result of increased rates of natural disasters and variable weather patterns. One article reports that, "When a family is faced with the impact of the climate crisis, girls’ education is one of the first things families drop" (Medlicott, 2021). Another meta-analysis consisting of 53 studies report that two-thirds of those studies find that women are more often the victims of death or injury in the case of extreme weather events (Seller, 2016). If women are, on average, affected disproportionately affected by climate externalities, then one could expect that, on average, rational policymakers who are women would enact policies concerning climate policy at higher and potentially at more effective rates (pertaining to protecting the needs of women) relative to other compositions of policymakers with lower proportions of women.
 
 # Data
+
+The data used for this analysis was strategically gathered using publically available sources (either by ethical web-scraping methods or direct download). The Inter-Parliamantary Union (IPU) maintains a consistent archive of records that monitors the number of women elected into the national legislature for each country. Not every government maintains the same structure of government, however, the IPU distinguishes between women elected into the lower-house and upper-house levels of government throughout multiple time periods. I take the average proportion of women holding office in the national legislature overall in a given year by taking a weighted average of the two houses. I obtained emissions data, including total yearly Gt (gigatons) $CO_2$ emissions per capita per country from the Emissions Database for Global Atmospheric Research (EDGAR) as maintained by the European Commission. I obtained country-year-level specific covariates, such as population and GDP per capita, from the World Bank. I obtained the data base linking each country's year they passed some legal right of suffrage from "A Lexical Index of Electoral Democracy" on the Harvard Dataverse (Skaaning et. al, 2015). I checked country-specific anomalies using data from the Pew Research Center (Schaeffer, 2020). Finally, I used U.S. Department of State's regional definitions to define which countries I define as either African or Arab.
+
+By adjusting for time, country, and other specific endogenous effects on the proportion of women in government in a country ($c$) at year ($t$), I hope to show that, effectively, when proportions of women in government increase, $CO_2$ emissions decrease. However, one potential problem with data is that I fail to account for country-specific government intricacies that could prevent that could prevent women or a legislature from passing effective climate policy--such as failing to account for government corruption or other unique anomalies (wars between countries, coups, etc, that prevent a government from acting effeciently)--at every year. I assume that on average, these factors in the idiosyncratic term of my model are 0 for any given country at year $t$.
+
+# Identification
+
+To estimate the causal effect that electing more women in national legislatures in African and Arab countries has on reducing per capita $CO_2$ emissions, I employ a fuzzy difference-in-difference identification strategy.
+
+$$
+Y_{ct}=\beta_0+\delta W_{ct-1}+X_{ct-1}'\Omega+\sum_{k=\text{Albania}}^{Zimbabwe}\beta_k\mathbb{1}(\text{Country}_c=k)+\sum_{j=1998}^{2022}\gamma_j\mathbb{1}(\text{Year}_t=j)+\epsilon_{ct} 
+$$
+
+$$
+W_{ct-1}=\pi_0+\lambda Z_{ct-1}+X_{ct-1}'\Omega+\sum_{k=\text{Albania}}^{Zimbabwe}\mu_k\mathbb{1}(\text{Country}_c=k)+\sum_{j=1998}^{2022}\eta_j\mathbb{1}(\text{Year}_t=j)+v_{ct}
+$$
+
 
 ## [1] UN Refugee Agency (UNHCR) [https://www.unhcr.org/refugee-statistics](https://www.unhcr.org/refugee-statistics/download/?url=BUyhn3)
 
