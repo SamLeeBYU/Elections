@@ -1,0 +1,25 @@
+\newcommand{\sym}[1]{\ifmmode^{#1}\else\textbf{(#1)}\fi}
+\begin{center}
+    \begin{table}
+    \caption{Regression Results: Two-Stage Difference-in-Difference Regression Results (year and country-fixed effects omitted)}
+    \begin{tabular}{l*{1}{c}}
+    \hline\hline
+                &\multicolumn{1}{c}{$CO_2$ Emissions (Gigatons per Capita)} \\
+    \hline
+    $\delta$&                -27.26\sym{***}\\
+                &       [-30.56,-23.97]         \\
+    [1em]
+    $\text{GDP per Capita}_{ct-1}$&             0.0000176         \\
+                &[-0.0000252,0.0000604]         \\
+    [1em]
+    $\beta_0$      &                 5.560\sym{***}\\
+                &         [4.982,6.137]         \\
+    \hline
+    \(N\)       &                  1514         \\
+    \hline\hline
+    \multicolumn{2}{l}{\footnotesize 95\% confidence intervals in brackets}\\
+    \multicolumn{2}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\    
+    \end{tabular}
+    \end{table}
+    \label{tab:regression_results}
+\end{center}
