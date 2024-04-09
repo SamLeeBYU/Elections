@@ -150,12 +150,12 @@ Both $CO_2$ emissions and women representation in government are highly correlat
 
 To eliminate this endogeneity I invoke a two-stage difference-in-difference design, using an instrumental variable for $W_{ct-1}$. A common instrument in the literature for women parliament has been to use the number of years since the country passed a bill/law of suffrage (Mavisakalyan & Tarverdi, 2019). I use similar instrumental variable design here. Let $Z_{ct-1}$ be the number years since a country $c$ has granted suffrage (measured at year $t$, and lagged one year to align with $W_{ct}$).
 
-In the difference-in-difference design, I use 62 country-fixed effects (omitting Angola and Burundi dummies due to colinearity). After lagging $W_{ct}$ one year, I am left with data spanning 1998-2022, thus, including year-fixed effects, I omit 1999. I utilize the following two-stage estimation approach:
+In the difference-in-difference design, I use 62 country-fixed effects (omitting the Angola dummy due to colinearity). After lagging $W_{ct}$ one year, I am left with data spanning 1998-2022, thus, including year-fixed effects, I also omit 1999 and 2000 for colinearity. I utilize the following two-stage estimation approach:
 $$
-(1) \quad W_{ct-1}=\pi_0+\lambda Z_{ct-1}+X_{ct-1}'\Psi+\sum_{k=\text{Benin}}^{Zimbabwe}\mu_k\mathbb{1}(\text{Country}_c=k)+\sum_{j=1999}^{2022}\eta_j\mathbb{1}(\text{Year}_t=j)+v_{ct}
+(1) \quad W_{ct-1}=\pi_0+\lambda Z_{ct-1}+\sum_{p=2}^PX_{ct-p}'\Psi_p+\sum_{k=\text{Burundi}}^{Zimbabwe}\mu_k\mathbb{1}(\text{Country}_c=k)+\sum_{j=2000}^{2022}\eta_j\mathbb{1}(\text{Year}_t=j)+v_{ct}
 $$
 $$
-(2) \quad Y_{ct}=\beta_0+\delta W_{ct-1}+X_{ct-1}'\Omega+\sum_{k=\text{Benin}}^{Zimbabwe}\beta_k\mathbb{1}(\text{Country}_c=k)+\sum_{j=1999}^{2022}\gamma_j\mathbb{1}(\text{Year}_t=j)+\epsilon_{ct}
+(2) \quad Y_{ct}=\beta_0+\delta W_{ct-1}+\sum_{p=2}^PX_{ct-p}'\Omega_p+\sum_{k=\text{Burundi}}^{Zimbabwe}\beta_k\mathbb{1}(\text{Country}_c=k)+\sum_{j=2000}^{2022}\gamma_j\mathbb{1}(\text{Year}_t=j)+\epsilon_{ct}
 $$
 
 ## The validity of years since suffrage as an instrument
@@ -166,7 +166,7 @@ Mavisakalyan & Tarverdi, although make use of a cross-sectional data set, to the
 women %>%
   ggplot(aes(y=lag(womenrep), x=lag(z)))+
   geom_point(size=0.5)+
-  geom_jitter(size=0.5, width=0.05, height=0.05)+
+  geom_jitter(size=0.5, width=0.1, height=0.01)+
   geom_smooth(method = "lm", se=F, color="#44CCAA")+
   theme_minimal()+
   labs(
@@ -185,9 +185,9 @@ The regression coefficient is significantly positive: `r z.beta %>% round(5)` (`
 
 With the difference-in-difference approach, using country and yearly fixed effects, there is reason to believe that $Y_{ct}(W_{ct-1}) \perp Z_{ct-1}|X_{ct-1}, \text{Country}_c, \text{Year}_t$. In other words, regardless of when a country granted suffrage, the potential resulting carbon emissions per capita as function of the proportion of women in the national legislature in a country $c$ are only dependent upon $W_{ct-1}$ after fixed effects are accounted for. However, as Mavisakalyan & Tarverdi note, "[our instrument] would be questionable if there is the possibility that the history of suffrage affects climate change policy outcomes through mechanisms other than the Female in Parliament." Mathematically, I assume,
 $$
-\mathbb{E}[Z_{ct-1}v_{ct}]=0\quad\forall c,t
+\mathbb{E}[Z_{ct-1}v_{ct}|\mathbb{X}_{ct}]=0\quad\forall c,t
 $$
-This could be violated if countries whose governments are established after colonial rule have (1) strong dependencies to the formal colonial power in terms of institutional structure and (2) as a function of that institutional structure, relies on carbon-intensive resources to kickstart its economy in post-colonial development. In other words, the instrument will be invalid if there are interactions between time, country, and carbon emissions. Evidently, more research needs to be done to see if this is the case, however, countries that granted suffrage to women immediately after occupation typically took place in the late 1900s, if it was less than random which countries these were, then the economic development--in relation to carbon-intensive resources--is also most likely non-random as well and thus would cause endogeneity in the instrument. In order to assert this, one would have to see a distinct pattern between the time periods of when women were granted suffrage and some other metric associated with carbon-intensive resource use such as oil exports. In this paper, I assume away this endogeneity by claiming that the instrument is as good as random (independent)--there is no distinct correlation between when a country granted suffrage and the types of resources the country typically consumes. Additionally, I assume monotonicity: the longer a country has passed from the year it granted suffrage, the more, on average, women are elected into national legislatures--I assume that there are no countries for which this trend reverses. The monotonicity assumption may be violated if women become less interested in politics over time for certain countries such that their participation decreases and hence the average proportion of women in national legislatures decrease with respect to years since suffrage.
+Where $\mathbb{X}_{ct}$ is the matrix of covariates (including country and yearly fixed effects) I include in equations (1) and (2). This could be violated if countries whose governments are established after colonial rule have (1) strong dependencies to the formal colonial power in terms of institutional structure and (2) as a function of that institutional structure, relies on carbon-intensive resources to kick start its economy in post-colonial development. In other words, the instrument will be invalid if there are interactions between time, country, and carbon emissions. Evidently, more research needs to be done to see if this is the case, however, countries that granted suffrage to women immediately after occupation typically took place in the late 1900s, if it was less than random which countries these were, then the economic development--in relation to carbon-intensive resources--is also most likely non-random as well and thus would cause endogeneity in the instrument. In order to assert this, one would have to see a distinct pattern between the time periods of when women were granted suffrage and some other metric associated with carbon-intensive resource use such as oil exports. In this paper, I assume away this endogeneity by claiming that the instrument is as good as random (independent)--there is no distinct correlation between when a country granted suffrage and the types of resources the country typically consumes. Additionally, I assume monotonicity: the longer a country has passed from the year it granted suffrage, the more, on average, women are elected into national legislatures--I assume that there are no countries for which this trend reverses. The monotonicity assumption may be violated if women become less interested in politics over time for certain countries such that their participation decreases and hence the average proportion of women in national legislatures decrease with respect to years since suffrage.
 
 ## Assumptions for difference-in-differences
 
@@ -218,30 +218,32 @@ This paper reaffirms the effect that was outlined by Mavisakalyan & Tarverdi. Ut
 
 # References
 
-1. Emissions Database for Global Atmospheric Research (EDGAR). (n.d.). Edgar online. Retrieved from [https://edgar.jrc.ec.europa.eu/](https://edgar.jrc.ec.europa.eu/)
+1. Bertrand, M., Duflo, E., & Mullainathan, S. (2004). How much should we trust differences-in-differences estimates? [https://www.nber.org/system/files/working_papers/w31063/w31063.pdf](https://www.nber.org/system/files/working_papers/w31063/w31063.pdf)
 
-2. European Commission, Joint Research Centre (JRC). (2023). Emissions gap report 2023. Publications Office of the European Union. doi:10.2760/481442 [https://edgar.jrc.ec.europa.eu/report_2023](https://edgar.jrc.ec.europa.eu/report_2023)
+2. Emissions Database for Global Atmospheric Research (EDGAR). (n.d.). Edgar online. Retrieved from [https://edgar.jrc.ec.europa.eu/](https://edgar.jrc.ec.europa.eu/)
 
-3. Inter-Parliamentary Union (IPU). (n.d.). Women in national parliaments. [Data set]. Retrieved from [https://data.ipu.org/womon-ranking](https://data.ipu.org/womon-ranking)
+3. European Commission, Joint Research Centre (JRC). (2023). Emissions gap report 2023. Publications Office of the European Union. doi:10.2760/481442 [https://edgar.jrc.ec.europa.eu/report_2023](https://edgar.jrc.ec.europa.eu/report_2023)
 
-4. Mavisakalyan, A., & Tarverdi, Y. (2019). Gender and climate change: Do female parliamentarians make a difference? Global Labor Organization (GLO) Discussion Paper No. 221. [https://www.sciencedirect.com/science/article/pii/S0176268017304500](https://www.sciencedirect.com/science/article/pii/S0176268017304500)
+4. Grier, R., & Maldonado, B. (2015). Electoral experience, institutional quality, and economic development in Latin America. Oxford Development Studies, 43(2), 253-280.
 
-5. Medlicott, E. (2021, March 8). The five devastating reasons climate change affects women more than men. Retrieved from [https://www.euronews.com/green/2021/11/09/the-five-devastating-reasons-climate-change-affects-women-more-than-men](https://www.euronews.com/green/2021/11/09/the-five-devastating-reasons-climate-change-affects-women-more-than-men)
+5. Hicks, D. L., Hicks, J. H., & Maldonado, B. (2016). Women as policy makers and donors: Female legislators and foreign aid. European Journal of Political Economy, 44(2), 118-135. doi: 10.1016/j.europoleco.2015.12.004
 
-6. Mirziyoyeva, N., & Salahodjaev, D. (2023). Does representation of women in parliament promote economic growth? Considering evidence from Europe and Central Asia. Frontiers in Political Science, 4(2). [DOI: 10.3389/fpos.2023.1203221] [https://www.frontiersin.org/articles/10.3389/fpos.2023.1120287/full](https://www.frontiersin.org/articles/10.3389/fpos.2023.1120287/full)
+6. Inter-Parliamentary Union (IPU). (n.d.). Women in national parliaments. [Data set]. Retrieved from [https://data.ipu.org/womon-ranking](https://data.ipu.org/womon-ranking)
 
-7. Schaeffer, Katherine (2020, October 5). Pew Research Center. Key facts about women's suffrage around the world, a century after U.S. ratified 19th Amendment. Retrieved April 1, 2024, from [https://www.pewresearch.org/short-reads/2020/10/05/key-facts-about-womens-suffrage-around-the-world-a-century-after-u-s-ratified-19th-amendment/](https://www.pewresearch.org/short-reads/2020/10/05/key-facts-about-womens-suffrage-around-the-world-a-century-after-u-s-ratified-19th-amendment/)
+7. Mavisakalyan, A., & Tarverdi, Y. (2019). Gender and climate change: Do female parliamentarians make a difference? Global Labor Organization (GLO) Discussion Paper No. 221. [https://www.sciencedirect.com/science/article/pii/S0176268017304500](https://www.sciencedirect.com/science/article/pii/S0176268017304500)
 
-8. Sellers, S. (2016). Gender and climate change: A closer look at existing evidence. Global Gender and Climate Alliance (GGCA). [https://wedo.org/gender-and-climate-change-a-closer-look-at-existing-evidence-ggca/](https://wedo.org/gender-and-climate-change-a-closer-look-at-existing-evidence-ggca/)
+8. Medlicott, E. (2021, March 8). The five devastating reasons climate change affects women more than men. Retrieved from [https://www.euronews.com/green/2021/11/09/the-five-devastating-reasons-climate-change-affects-women-more-than-men](https://www.euronews.com/green/2021/11/09/the-five-devastating-reasons-climate-change-affects-women-more-than-men)
 
-9. Skaaning, Svend-Erik; John Gerring; Henrikas Bartusevicius, 2015, "A Lexicial Index of Electoral Democracy", [https://doi.org/10.7910/DVN/29106](https://doi.org/10.7910/DVN/29106), Harvard Dataverse, V6
+9. Mirziyoyeva, N., & Salahodjaev, D. (2023). Does representation of women in parliament promote economic growth? Considering evidence from Europe and Central Asia. Frontiers in Political Science, 4(2). [DOI: 10.3389/fpos.2023.1203221] [https://www.frontiersin.org/articles/10.3389/fpos.2023.1120287/full](https://www.frontiersin.org/articles/10.3389/fpos.2023.1120287/full)
 
-10. United Nations Development Programme (UNDP). (2022, March 8). International Women’s Day 2022 “Gender equality today for a sustainable tomorrow”. Retrieved from [https://www.undp.org/speeches/undp-administrators-statement-international-womens-day-2023-8-march](https://www.undp.org/speeches/undp-administrators-statement-international-womens-day-2023-8-march)
+10. Schaeffer, Katherine (2020, October 5). Pew Research Center. Key facts about women's suffrage around the world, a century after U.S. ratified 19th Amendment. Retrieved April 1, 2024, from [https://www.pewresearch.org/short-reads/2020/10/05/key-facts-about-womens-suffrage-around-the-world-a-century-after-u-s-ratified-19th-amendment/](https://www.pewresearch.org/short-reads/2020/10/05/key-facts-about-womens-suffrage-around-the-world-a-century-after-u-s-ratified-19th-amendment/)
 
-11. U.S. Department of State. (n.d.). Countries and Areas List. Retrieved from [https://www.state.gov/countries-and-areas-list/](https://www.state.gov/countries-and-areas-list/)
+11. Sellers, S. (2016). Gender and climate change: A closer look at existing evidence. Global Gender and Climate Alliance (GGCA). [https://wedo.org/gender-and-climate-change-a-closer-look-at-existing-evidence-ggca/](https://wedo.org/gender-and-climate-change-a-closer-look-at-existing-evidence-ggca/)
 
-12. The World Bank. (n.d.). World Bank Open Data. Retrieved from [https://databank.worldbank.org](https://databank.worldbank.org)
+12. Skaaning, Svend-Erik; John Gerring; Henrikas Bartusevicius, 2015, "A Lexicial Index of Electoral Democracy", [https://doi.org/10.7910/DVN/29106](https://doi.org/10.7910/DVN/29106), Harvard Dataverse, V6
 
-13. Grier, R., & Maldonado, B. (2015). Electoral experience, institutional quality, and economic development in Latin America. Oxford Development Studies, 43(2), 253-280.
+13. United Nations Development Programme (UNDP). (2022, March 8). International Women’s Day 2022 “Gender equality today for a sustainable tomorrow”. Retrieved from [https://www.undp.org/speeches/undp-administrators-statement-international-womens-day-2023-8-march](https://www.undp.org/speeches/undp-administrators-statement-international-womens-day-2023-8-march)
 
-14. Hicks, D. L., Hicks, J. H., & Maldonado, B. (2016). Women as policy makers and donors: Female legislators and foreign aid. European Journal of Political Economy, 44(2), 118-135. doi: 10.1016/j.europoleco.2015.12.004
+14. U.S. Department of State. (n.d.). Countries and Areas List. Retrieved from [https://www.state.gov/countries-and-areas-list/](https://www.state.gov/countries-and-areas-list/)
+
+15. The World Bank. (n.d.). World Bank Open Data. Retrieved from [https://databank.worldbank.org](https://databank.worldbank.org)

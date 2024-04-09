@@ -5,6 +5,8 @@ Author: Sam Lee
 This script takes in all of our data sets and merges them into one cleaned data set for data analysis
 */
 
+cd "C:\Users\slee039\Box\ECON 398\Final Project"
+
 //Load in suffrage data for each country to create instrument
 import delimited "Data/suffrage.csv", varnames(1) clear
 sort  countryn year
@@ -113,6 +115,23 @@ sort countrycode year
 
 save Data/IPU.dta, replace
 
+//Load is disasters data for placebo test
+import excel using "Data/disasters.xlsx", sheet("EM-DAT Data") firstrow clear
+
+//This includes things like epidemics and viral diseases, which may be influenced by the number of women in legislature if women enact specific policies that influence vaccines, health outcomes, the likelihood of infections, etc.
+drop if DisasterSubgroup == "Biological"
+
+rename StartYear year
+rename ISO countrycode
+
+keep countrycode year
+
+gen n_disasters = 1
+//The number of natural disasters that happened in each country during each year
+collapse (sum) n_disasters, by (countrycode year)
+
+save Data/disasters.dta, replace
+
 //Covariate Data from the World Bank
 import delimited "Data/worldbank.csv", varnames(1) rowrange(1:652) clear
 
@@ -175,5 +194,6 @@ drop if z == .
 //Saudia Arabia only holds local elections (which women were enfranchised in 2015)
 //UAE doesn't grant universal suffrage for women (or anyone), and only recently held national elections in 2006, allowing a small number of voters to participate.
 
-//NOTE: The womenrep data for years 1985-1996 will be missing for every country since that data wasn't provided by the IPU. We keep these rows in here anyhow because we might want previous years to verify the parallel trends assumption.
+//NOTE: The womenrep data for years 1985-1996 will be missing for every country since that data wasn't provided by the IPU. We keep these rows in here anyhow because we might want previous years to verify the parallel trends assumption and to use lags from other variables.
 save Data/womenrep.dta, replace
+export delimited using "Data/womenrep.csv", replace
