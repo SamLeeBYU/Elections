@@ -55,16 +55,17 @@ reg womenrep_lag z_lag lgdp* lpopulation* _Iyear* _Icountry*
 //Two-stage diff-in-diff regression (Main regression to derive delta)
 ivregress 2sls co2 lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag)
 
-sort countryid
-by countryid: gen rsamp = floor(_N * runiform())+1
-by countryid: gen co2new = co2[rsamp]
-drop rsamp
-
-ivregress 2sls co2new lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag)
-
 //Save results to a latex table
 ssc install estout
 esttab using "regression_results_raw.tex", replace ci
+
+sort countryid
+gen rsamp = floor(_N * runiform())+1
+gen cl_bootstrap = co2[rsamp]
+drop rsamp
+
+//placebo regression
+ivregress 2sls cl_bootstrap lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag)
 
 /*one way CV1 and CV3 */
 adopath + "C:\Users\slee039\Box\ECON 398\Final Project\Resources\MNW-guide-replic-do-files"

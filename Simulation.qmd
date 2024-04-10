@@ -68,66 +68,6 @@ Z.tilde <- cbind(Z.ct1.tilde, X.tilde[, 2:ncol(X.tilde)])
 
 X <- cbind(W.ct1, X.covariates, fixed.effects, 1)
 Z <- cbind(Z.ct1, X.covariates, fixed.effects, 1)
-
-#By the Frisch-Waugh Theorem, these are equivalent:
-# coef(ivreg.fit(X, Y, Z))
-# coef(ivreg.fit(X.tilde, Y.tilde, Z.tilde))
-
-#Regression using partialled out variables
-# fs.tilde <- lm(X.tilde[,1] ~ 0 + Z.tilde)
-# summary(fs.tilde)
-# 
-# coef(ivreg.fit(X.tilde, Y.tilde, Z.tilde))
-
-# standardize <- function(v){
-#   (v-mean(v, na.rm=T))/sd(v, na.rm=T)
-# }
-# 
-# women <- read_dta("Data/womenrep.dta") %>%
-#   mutate(
-#     population = log(population),
-#     gdp = log(gdp)
-#   )
-# 
-# lag.effect = 5
-# 
-# W.ct = women$womenrep %>% lag() %>% as.matrix()
-# Z.ct = women$z %>% lag() %>% as.matrix()
-# X.ct = women$population %>% lag(2) %>% as.matrix()
-# X.ct = cbind(X.ct, women$gdp %>% lag(2))
-# if(lag.effect > 2){
-#   for(p in 3:lag.effect){
-#     X.ct <- cbind(X.ct, lag(women$population, p))
-#     X.ct <- cbind(X.ct, lag(women$gdp, p))
-#   } 
-# }
-# 
-# W.ct = W.ct[women$year >= 1997,] %>% as.matrix()
-# Z.ct = Z.ct[women$year >= 1997,] %>% as.matrix()
-# X.ct = X.ct[women$year >= 1997,] %>% as.matrix()
-# 
-# women <- women %>% filter(year >= 1997) %>%
-#   mutate(
-#     countrycode = relevel(factor(countrycode), ref="QAT"),
-#     year = relevel(factor(year), ref="1997")
-#   )
-# 
-# colnames(W.ct) <- str_c("W.ct", 1)
-# colnames(Z.ct) <- str_c("Z.ct", 1)
-# colnames(X.ct) <- c(str_c(rep(c("Population.ct", "GDP.ct"), lag.effect-1), 
-#                           rep(2:lag.effect, each=2)))
-# 
-# women.cleaned <- cbind(women[c("co2", "year", "countrycode")],W.ct,Z.ct,X.ct)
-# women.cleaned <- women.cleaned[complete.cases(women.cleaned),]
-# 
-# women.saturated <- lm(co2 ~ countrycode + year, data=women.cleaned)
-# fixed.effects = model.matrix(women.saturated) %>% as.matrix()
-# fixed.effects = fixed.effects[,setdiff(colnames(fixed.effects), "countrycodeIRQ")]
-
-# Y <- women.cleaned$co2 %>% as.matrix()
-# X <- cbind(women.cleaned[colnames(W.ct)],women.cleaned[colnames(X.ct)],
-#            fixed.effects) %>% 
-#   as.matrix()
 ```
 # Data-Generating Process for Simulation
 
@@ -138,10 +78,11 @@ DGP <- function(clusters, Y, cluster=F){
   G = length(clusters)
   if(cluster){
     return(Y[unlist(sapply(1:G, function(g){
-      lag(cumsum(clusters), default=0)[g]+floor(runif(clusters[g]))+1
+      lag(cumsum(clusters), default=0)[g]+
+        floor(clusters[g]*runif(clusters[g]))+1
     }))])
   } else {
-    return(sample(Y, length(Y), replace=T))
+    return(Y[floor(length(Y)*runif(length(Y)))+1])
   }
 }
 
@@ -151,15 +92,29 @@ g.map <- women.cleaned %>% group_by(countryid) %>%
   ) %>% ungroup() %>% mutate(
     g.index = cumsum(total)
   )
+```
 
+```{r echo=F, eval=F}
 Y.new = DGP(g.map$total, Y, cluster=T)
-hist(Y.new)
+mean(Y.new)
+  g.start = lag(g.map$g.index, default=0)
+betas.real <- c()
+betas.synthetic <- c()
+for(g in 1:G){
+  cluster=g.start[g]:g.map$g.index[g]
+  betas.real[g] <- coef(lm(Y[cluster] ~ W.ct1[cluster] + X[cluster,2:9] + X[cluster,str_detect(colnames(X), "year")]))[2]
+  betas.synthetic[g] <- coef(lm(Y.new[cluster] ~ W.ct1[cluster] + X[cluster,2:9] + X[cluster,str_detect(colnames(X), "year")]))[2]
+}
+mean(betas.synthetic)
+hist(betas.real)
+hist(betas.synthetic)
+mean(betas.real)
 ```
 
 # Two-Stage Inference with Homoskedasticity Assumption
 
-```{r echo=F, eval=F}
-twosls <- function(X, Z, Y){
+```{r}
+twosls <- function(X, Y, Z){
   n <- nrow(X)
   if(ncol(X) == ncol(Z)){
     #Just Identified
@@ -180,8 +135,8 @@ twosls <- function(X, Z, Y){
 }
 
 #These two are the same via the Frisch-Waugh Theorem
-twosls(X, Z, Y.new)
-#twosls(X.tilde, Z.tilde, Y.new)
+#twosls(X, Z, Y)
+twosls(X.tilde, Y.tilde, Z.tilde)
 ```
 
 <!-- # Linear Regression with Asymptotic Homoskedastic Normal Variance Assumption -->
@@ -230,27 +185,7 @@ ols(X, Y, robust=T)
 <!-- \hat{X}=[\quad\tilde{W}\quad|\quad 1 \quad \text{Country}_c \quad \text{Year}_t\quad] \quad (N\times(k+1)) -->
 <!-- $$ -->
 
-```{r}
-
-```
-
-Cluster Robust Variance Function
-
-```{r}
-#Partial out fixed effects
-fixed.effects = X[,str_detect(colnames(X), "country|year")]
-Y.tilde = (fixed.effects%*%
-  solve(t(fixed.effects)%*%fixed.effects)%*%t(fixed.effects)%*%Y)-Y
-
-covariates = setdiff(colnames(X), c(colnames(fixed.effects)))
-X.tilde <- c()
-for(covariate in covariates){
-  X.tilde <- cbind(X.tilde, (fixed.effects%*%
-  solve(t(fixed.effects)%*%fixed.effects)%*%t(fixed.effects)%*%
-    X[,covariate])-X[,covariate])
-}
-colnames(X.tilde) <- c(covariates)
-
+```{r eval=F, echo=F}
 cluster.robust <- function(g.map, X, Y, cr=1){
   
   beta.hat <- solve(t(X)%*%X)%*%t(X)%*%Y
@@ -337,29 +272,58 @@ cluster.robust <- function(g.map, X, Y, cr=1){
 }
 ```
 
-1. Cluster Robust Variance #1 (Liang-Zeger)
+Cluster Robust Variance Function
 
-$$
-\text{CV}_1: \frac{G(N-1)}{(G-1)(N-k)}(\hat{X}'\hat{X})^{-1}(\sum_{g=1}^G\hat{s}_g\hat{s}_g')(\hat{X}'\hat{X})^{-1}
-$$
-$$
-\hat{s}_g=\hat{X}_g'\hat{u}_g
-$$
+```{r cluster-robust-function}
+cluster.robust.iv <- function(X, Y, Z, clusters){ #Assumes data is sorted
+  n <- nrow(X)
+  k <- ncol(X)
+  G <- length(clusters)
+  if(ncol(X) == ncol(Z)){
+    #Just Identified
+    beta.hat <- solve(t(Z)%*%X)%*%t(Z)%*%Y
+  }
+  u.hat <- X%*%beta.hat - Y
+    
+  xtz <- t(X)%*%Z
+  Sigma <- matrix(0, k, k)
+  for(g in 1:G){
+    cluster = (lag(cumsum(clusters), default = 0)[g]+1):cumsum(clusters)[g]
+    M.z <- solve(diag(1, clusters[g])-
+                   Z[cluster,]%*%solve(t(Z)%*%Z)%*%t(Z[cluster,]))
+    zeta.g <- t(Z[cluster,])%*%M.z%*%u.hat[cluster]
+    Sigma <- Sigma+zeta.g%*%t(zeta.g)
+  }
+  V <- (G-1)/G*solve(n^-1*xtz%*%solve(n^-1*Sigma)%*%t(n^-1*xtz))
+  
+  #95% C.I.
+  beta.hat[1,]+c(-1,1)*qnorm(0.975)*sqrt(n^-1*V[1,1])
+}
+```
 
-```{r}
+<!-- 1. Cluster Robust Variance #1 (Liang-Zeger) -->
+
+<!-- $$ -->
+<!-- \text{CV}_1: \frac{G(N-1)}{(G-1)(N-k)}(\hat{X}'\hat{X})^{-1}(\sum_{g=1}^G\hat{s}_g\hat{s}_g')(\hat{X}'\hat{X})^{-1} -->
+<!-- $$ -->
+<!-- $$ -->
+<!-- \hat{s}_g=\hat{X}_g'\hat{u}_g -->
+<!-- $$ -->
+
+```{r echo=F, eval=F}
 cluster.robust(g.map, X, Y, cr=1)
 ```
 
-2. Cluster Robust Variance #2
+<!-- 2. Cluster Robust Variance #2 -->
 
-$$
-(\hat{X}'\hat{X})^{-1}(\sum_{g=1}^{G}\grave{s}_g\grave{s}_g')(\hat{X}'\hat{X})^{-1}
-$$
-$$
-\grave{s}_g=\hat{X}'M_{gg}^{-1/2}\hat{u}_g;\quad M_{gg}=I_{N_g}-\hat{X}_g(\hat{X}'\hat{X})^{-1}\hat{X}_g'
-$$
+<!-- $$ -->
+<!-- (\hat{X}'\hat{X})^{-1}(\sum_{g=1}^{G}\grave{s}_g\grave{s}_g')(\hat{X}'\hat{X})^{-1} -->
+<!-- $$ -->
+<!-- $$ -->
+<!-- \grave{s}_g=\hat{X}'M_{gg}^{-1/2}\hat{u}_g;\quad M_{gg}=I_{N_g}-\hat{X}_g(\hat{X}'\hat{X})^{-1}\hat{X}_g' -->
+<!-- $$ -->
 
-```{r}
+```{r echo=F, eval=F}
 cluster.robust(g.map, X.tilde, Y.tilde, cr=2)
 ```
 
@@ -372,8 +336,23 @@ $$
 \acute{s}_g=\hat{X}_g'M_{gg}^{-1}\hat{u}_g
 $$
 
+Proposed CRVE for Two-Stage Least Squares
+
+$$
+\sqrt{n}(\hat{b}-\beta)\underset{d}{\rightarrow}N(0,(\mathbb{E}[X_iZ_i']\Sigma^{-1}\mathbb{E}[X_iZ_i']')^{-1})
+$$
+$$
+\implies \hat{V}=(\frac{1}{n}X'Z\hat{\Sigma}^{-1}(\frac{1}{n}X'Z)')^{-1}; \quad \Sigma^{-1}=\mathbb{E}[Z_iZ_i'u_i^2]\implies\hat{\Sigma}^{-1}=(\frac{1}{n}\sum_{g=1}^GZ_g'Z_g\hat{u_g}^2)^{-1}
+$$
+$$
+\frac{G-1}{G}(X'Z)^{-1}(\sum_{g=1}^{G}\hat{\zeta_g}\hat{\zeta_g'})(X'Z)^{-1}
+$$
+$$
+\hat{\zeta_g}=Z_g'\overset{z}{M}_{gg}^{-1}\hat{u_g};\quad \overset{z}{M}_{gg}=I_{N_g}-Z_g(Z'Z)^{-1}Z'
+$$
+
 ```{r}
-cluster.robust(g.map, X, Y, cr=3)
+cluster.robust.iv(X.tilde, Y.tilde, Z.tilde, g.map$total)
 ```
 
 # Simulated CRVE Intervals
@@ -381,21 +360,19 @@ cluster.robust(g.map, X, Y, cr=3)
 ```{r Simulation}
 simulate.CRVE <- function(n, bootstrap.cluster=F){
   n.sims <- n
-  sims.ci <- matrix(0, nrow=n.sims, ncol=2*4)
+  sims.ci <- matrix(0, nrow=n.sims, ncol=2*2)
   for(i in 1:n.sims){
-    #print(i)
-    Y.new = DGP(g.map$total, Y.tilde, cluster=bootstrap.cluster)
-    for(j in 1:4){
-      if(j == 4){
-        sims.ci[i,(j+(j-1)):(j+(j-1)+1)] = twosls(X.tilde, Y.new)
+    Y.new = DGP(g.map$total, Y.tilde, cluster=bootstrap.cluster) %>% as.matrix()
+    for(j in 1:2){
+      if(j == 2){
+        sims.ci[i,(j+(j-1)):(j+(j-1)+1)] = twosls(X.tilde, Y.new, Z.tilde)
       } else {
-        # sims.ci[i,(j+(j-1)):(j+(j-1)+1)] = 
-        #   cluster.robust(g.map, X, as.matrix(Y.new), cr=j)
+        sims.ci[i,(j+(j-1)):(j+(j-1)+1)] =
+          cluster.robust.iv(X.tilde, Y.new, Z.tilde, g.map$total)
       }
     }
   }
-  colnames(sims.ci) <- c("LZ.025", "LZ.975", "CR2.025", "CR2.975",
-                         "JackKnife.025", "JackKnife.975",
+  colnames(sims.ci) <- c("JackKnife.025", "JackKnife.975",
                           "2SLS.025", "2SLS.975")
   return(sims.ci)
 }
@@ -421,7 +398,7 @@ simulate.CRVE(10) %>% round(2) %>% knitr::kable()
 # Simulated CRVE Intervals with Clustered Bootstrap Sampling
 
 ```{r Cluster-Bootstrap-Simulation}
-sims.cluster = simulate.CRVE(1000, bootstrap.cluster = T)
+sims.cluster = simulate.CRVE(1000, bootstrap.cluster = F)
   
 sims.cluster %>%
   round(2) %>% head(10) %>% knitr::kable()

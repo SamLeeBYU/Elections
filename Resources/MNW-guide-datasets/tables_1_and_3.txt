@@ -8253,3 +8253,4 @@ end of do-file
 
 r(430);
 
+. exit, clear
