@@ -50,6 +50,9 @@ replace n_disasters = cond(n_disasters == ., 0, n_disasters)
 xi i.countrycode i.year, noomit
 drop _Icountryco_46 _Icountryco_27 _Iyear_1997 _Iyear_1998
 
+//Save regression matrix
+save Data/disasters_regression_matrix.dta, replace
+
 //Two-stage regression on placebo (poisson-distributed)
 qui ivregress 2sls n_disasters lgdp* lpopulation* _I* (womenrep_lag=z_lag), cluster(countryid)
 

@@ -53,7 +53,7 @@ save Data/regression_matrix.dta, replace
 reg womenrep_lag z_lag lgdp* lpopulation* _Iyear* _Icountry*
 
 //Two-stage diff-in-diff regression (Main regression to derive delta)
-ivregress 2sls co2 lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag)
+ivregress 2sls co2 lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag), cluster(countryid)
 
 //Save results to a latex table
 ssc install estout
@@ -65,7 +65,7 @@ gen cl_bootstrap = co2[rsamp]
 drop rsamp
 
 //placebo regression
-ivregress 2sls cl_bootstrap lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag)
+ivregress 2sls cl_bootstrap lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag), cluster(countryid)
 
 /*one way CV1 and CV3 */
 adopath + "C:\Users\slee039\Box\ECON 398\Final Project\Resources\MNW-guide-replic-do-files"
