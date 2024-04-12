@@ -21,7 +21,7 @@ For git users:
 ```
 git clone "https://github.com/SamLeeBYU/Elections"
 ```
-Alternatively, you can just download the files manually
+- Alternatively, you can just download the files manually
 2) Navigate into the project directory
 ```
 cd Elections
@@ -64,7 +64,7 @@ This data was directly (and publicly) downloaded from the World Bank's Open Data
 
 #### Analytic Sample [womenrep.csv](Data/womenrep.csv)
 
-This is the final wrangled, cleaned data file saved by [DataWrangle.do](Scripts/DataWrangle.do) (in .csv format--there's an equivalent file with .dta extension). This file is then pulled into [analysis.dp](Scripts/analysis.do) and [placebo.do](Scripts/analysis.do) for appropriate regression analysis.
+This is the final wrangled, cleaned data file saved by [DataWrangle.do](Scripts/DataWrangle.do) (in .csv format--there's an equivalent file with .dta extension). This file is then pulled into [analysis.do](Scripts/analysis.do) and [placebo.do](Scripts/analysis.do) for appropriate regression analysis.
 
 
 Note: All other files with the .dta extension are simply the cleaned or processed files by [DataWrangle.do](Scripts/DataWrangle.do).
