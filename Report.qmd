@@ -286,14 +286,12 @@ in government over time as women's rights expand in politics.
 Mavisakalyan and Tarverdi note that "a country's history of suffrage
 should be highly relevant for female exposure to politics" (160). By partialling-out $Z_{ct-1}$ on the fixed-effects and control
 variables[^14], the regression coefficient is significantly positive:
-`r z.beta %>% round(5)` (`r z.ci[1]`, `r z.ci[2]`). Hence, we have
-significant evidence to believe in the relevance condition of using
-(lagged) years since suffrage as an instrument. Regardless of when a country granted suffrage, I assert that the
+`r z.beta %>% round(5)` (`r z.ci[1]`, `r z.ci[2]`). Regardless of when a country granted suffrage, I assert that the
 potential carbon emissions per capita as a function of the proportion of
 women in the national legislature in a country $c$ are only dependent
 upon $W_{ct-1}$ after fixed effects are accounted for, and not on
 $Z_{ct-1}$. Mathematically,
-$Z_{ct-1} \perp Y_{ct}(W_{ct-1})|X_{ct-1}, \text{Country}_c, \text{Year}_t$.
+$Z_{ct-1} \perp Y_{ct}(W_{ct-1})|X_{ct-1},...,X_{ct-P}, \text{Country}_c, \text{Year}_t$.
 However, as Mavisakalyan & Tarverdi note, "\[our instrument\] would be
 questionable if there is the possibility that the history of suffrage
 affects climate change policy outcomes through mechanisms other than the
@@ -625,31 +623,75 @@ tibble(
 ```
 \newpage
 ```{r visuals, echo=F, warning=F, message=F, fig.align='center', fig.width=16, fig.height=16}
-label_data <- women %>%
-  filter(year >= 1997) %>%
-  group_by(countrycode) %>%
+women.rsamp <- women %>% filter(year >= 1997) %>%
+  filter(country %in% sample(unique(country))[1:10])
+
+label_data <- women.rsamp %>%
+  group_by(country) %>%
   summarize(
     ryear = sample(min(year):max(year), 1),
     womenrep = womenrep[which(year == ryear)],
     co2 = co2[which(year == ryear)]
   )
 
+aggregate_womenrep <- women.rsamp %>%
+  ggplot(aes(x=year, y=womenrep, group=country, color=country))+
+  geom_line()+
+  geom_text_repel(
+    data = label_data,
+    aes(x=ryear, label = country),
+    label.padding = 0.25,
+    box.padding = unit(0.5, "lines"),  # Padding around the box
+    box.color = "black",  # Box color
+    nudge_y = 0.1,  # Adjust position of labels
+    direction = "both",
+    max.overlaps = 20,
+    segment.size = 0.4,
+    nudge_x = 0.3,
+    color="black"
+  ) +
+  labs(
+    x="Year",
+    y="Proportion of Women in Government",
+    title="Figure 1 - Average Proportion of Women in National Legislatures Over Time"
+  )+
+  guides(color = "none") +
+  theme(axis.text = element_text(size = 36))+
+  scale_x_continuous(labels = function(x) substr(x, 3, 4))+
+  theme_minimal()
+
+aggregate_co2 <- women.rsamp %>%
+  ggplot(aes(x=year, y=co2, group=country, color=country))+
+  geom_line()+
+  geom_text_repel(
+    data = label_data,
+    aes(x=ryear, label = country),
+    label.padding = 0.25,
+    box.padding = unit(0.5, "lines"),  # Padding around the box
+    box.color = "black",  # Box color
+    nudge_y = 0.3,  # Adjust position of labels
+    direction = "both",
+    segment.size = 0.4,
+    nudge_x = 0.1,
+    max.overlaps = 20,
+    color="black"
+  ) +
+  guides(color = "none") +
+  labs(
+    x="Year",
+    y=expression("Gigatons of "~CO[2]~" Emissions Per Capita"),
+    title="Figure 2 - Per Capita Carbon Emissions Over Time"
+  )+
+  scale_x_continuous(labels = function(x) substr(x, 3, 4))+
+  theme(axis.text = element_text(size = 36))+
+  theme_minimal()
+
+#ggsave("Graphs/percapitaco2.png", aggregate_co2, width=14, height=8)
+#ggsave("Graphs/womenrep.png", aggregate_womenrep, width=14, height=8)
+
 women %>% filter(year >= 1996) %>%
   ggplot(aes(x=year, y=womenrep, group=country))+
   geom_line()+
-  # geom_text_repel(
-  #   data = label_data,
-  #   aes(x=ryear, label = countrycode),
-  #   label.padding = 0.25,
-  #   box.padding = unit(0.5, "lines"),  # Padding around the box
-  #   box.color = "black",  # Box color
-  #   nudge_y = 0.1,  # Adjust position of labels
-  #   direction = "both",
-  #   max.overlaps = 20,
-  #   segment.size = 0.4,
-  #   nudge_x = 0.3,
-  #   color="black"
-  # ) +
   labs(
     x="Year",
     y="Proportion of Women in Government",
@@ -664,19 +706,6 @@ women %>% filter(year >= 1996) %>%
 women %>% filter(year >= 1996) %>%
   ggplot(aes(x=year, y=co2, group=country))+
   geom_line()+
-  # geom_text_repel(
-  #   data = label_data,
-  #   aes(x=ryear, label = countrycode),
-  #   label.padding = 0.25,
-  #   box.padding = unit(0.5, "lines"),  # Padding around the box
-  #   box.color = "black",  # Box color
-  #   nudge_y = 0.3,  # Adjust position of labels
-  #   direction = "both",
-  #   segment.size = 0.4,
-  #   nudge_x = 0.1,
-  #   max.overlaps = 20,
-  #   color="black"
-  # ) +
   guides(color = "none") +
   labs(
     x="Year",
@@ -716,7 +745,7 @@ women %>%
   )
 
 
-data.frame(x=Z.tilde, y=Y.tilde) %>%
+relevance.plot <- data.frame(x=Z.tilde, y=Y.tilde) %>%
   ggplot(aes(y=y, x=x))+
     geom_point(size=0.5)+
     geom_jitter(size=0.5, width=0.1, height=0.01)+
@@ -727,6 +756,10 @@ data.frame(x=Z.tilde, y=Y.tilde) %>%
       y=expression(~tilde(W)[ct-1]),
       title = "Figure 4 - Relevance of Instrumental Variable Using Partialled-out Regressor and Regressand"
     )
+
+#ggsave("Graphs/relevance.png", relevance.plot, width=14, height=8)
+
+relevance.plot
 ```
 ```{r regression-results, fig.align='center', echo=F, warning=F, results='asis'}
 cat(readLines("regression_results.tex"), sep = "\n")
@@ -734,7 +767,7 @@ cat(readLines("regression_results.tex"), sep = "\n")
 ```{r n-disasters, warning=F, echo=F, fig.width=16, fig.height=16}
 disasters = read_dta("Data/disasters_regression_matrix.dta")
 
-disasters %>% ggplot() +
+placebo.plt <- disasters %>% ggplot() +
   geom_histogram(mapping = aes(x=n_disasters), binwidth = 1, fill="#44CCAA", alpha=0.5)+
   labs(
     x="Number of Natural Disasters per Year",
@@ -743,6 +776,10 @@ disasters %>% ggplot() +
   )+
   scale_x_continuous(breaks = 0:10)+
   theme_minimal()
+
+ggsave("Graphs/placebo.png", placebo.plt, width=14, height=8)
+
+placebo.plt
 
 disasters %>% filter(year >= 1996) %>%
   ggplot(aes(x=year, y=n_disasters, group=country))+
