@@ -99,13 +99,7 @@ then conclude.
 The data used for this analysis was strategically gathered using
 publicly available sources[^3]. The Inter-Parliamentary Union (IPU)
 maintains a consistent archive of records that monitors the number of
-women elected into the national legislature for each country. Not every
-government maintains the same structure of government, however, the IPU
-distinguishes between women elected into the lower house and upper house
-levels of government throughout multiple periods. I take the
-average proportion of women holding office in the national legislature
-overall in a given year by taking a weighted average of the two
-houses[^4][^5]. I obtained emissions data, including total yearly
+women elected into the national legislature for each country. I obtained emissions data, including total yearly
 (gigatons of) $CO_2$ emissions per capita per country, from the
 Emissions Database for Global Atmospheric Research (EDGAR) as maintained
 by the European Commission[^6]. I obtained country-year-level specific
@@ -114,7 +108,7 @@ obtained the database linking each country's year they passed a right
 of universal suffrage from "A Lexical Index of Electoral Democracy" on
 the Harvard Dataverse (Skaaning et. al, 2015). I checked
 country-specific anomalies using research from the Pew Research
-Center[^8] (Schaeffer, 2020). Finally, I used the U.S. Department of State's
+Center (Schaeffer, 2020). Finally, I used the U.S. Department of State's
 regional definitions to define which countries I define as either
 African or Arab.
 
@@ -124,16 +118,6 @@ African or Arab.
     project's Github repository
     <https://github.com/SamLeeBYU/Elections>.
 
-[^4]: Note that econometrically, this assumes that on average, the power
-    that women are given in each house of national legislature is equal
-    to the 'weight' of women in that chamber of legislature: In other
-    words, assuming a fair political system, I assume no chamber can
-    systemically dominate the other chamber.
-
-[^5]: A graphical illustration of the average proportion of women in the
-    national legislatures for each country in my sample can be seen in
-    Figure 1 of the Appendix.
-
 [^6]: A graphical illustration of the yearly $CO_2$ emissions over time
     for each country in my sample can be seen in Figure 2 of the
     Appendix.
@@ -141,66 +125,24 @@ African or Arab.
 [^7]: Statistics for these key variables are summarized in Table 1 of
     the Appendix.
 
-[^8]: Not all countries in Africa and the Middle East treat women
-    equally. Even when suffrage is granted, it is not granted
-    universally. Thus, the instrument may not influence the proportion
-    of women in government the same in every country. This does not
-    discredit my econometric analysis, however, so long as the
-    monotonicity assumption of my instrument is met (which will be
-    discussed hereafter). However, I exclude obvious anomalies in my
-    analytic sample. See Table 2 in the Appendix for summary statistics
-    for each country in my sample.
 ```{=latex}
 \end{doublespace}
 ```
 ```{=latex}
 \begin{doublespace}
 ```
-By adjusting for time, country, and other specific endogenous effects on
-the proportion of women in government in a country ($c$) at year ($t$),
-I hope to show that effectively when the proportions of women in government
-increase, $CO_2$ emissions decrease. However, one potential problem with
+One potential problem with
 data is that I do not account for country-specific government
 intricacies that could prevent women or a legislature from
 passing effective climate policy---such as not accounting for government
 corruption or other unique anomalies (wars between countries, coups,
 laws that are discriminatory against women, etc, that prevent a
-government from acting efficiently)---at every year[^9].
+government from acting efficiently)---at every year[^9]. Merging the suffrage data with all the IPU available data and the $CO_2$ emissions data from EDGAR, I was left with 64 countries spanning 1997-2022. Refer to [A2](#a2) for more specific details on the nature of the data. 
 
 [^9]: To assert consistency in my estimates, econometrically, I assume
     that on average, these factors in the idiosyncratic term of my
     econometric model are 0 for any given country at year $t$. (See
     equation (3)).
-```{=latex}
-\end{doublespace}
-```
-
-```{=latex}
-\begin{doublespace}
-```
-In my sample, the United Arab Emirates (UAE) and Saudia Arabia are
-excluded because they don't give full suffrage to women: The UAE held
-its first national elections in 2006, but only a select amount of men
-and women were eligible to participate (Schaeffer, 2020). Saudi Arabia
-doesn't hold national elections[^10]. This leaves us with a total of 64
-different countries in the analytic sample. Merging the suffrage data
-with all the IPU available data and the $CO_2$ emissions data from
-EDGAR, I was left with data spanning 1997-2022[^11].
-
-[^10]: Women are, however, enfranchised at the local level government levels.
-
-[^11]: Notably, the data is left as an unbalanced panel data set (See
-    Table 2 in the Appendix). The World Bank does not have GDP or
-    population data for every single year of every single country in the
-    data, and critically, the IPU also notes that it cannot reliably
-    retrieve the number of women in national legislatures for every
-    year. These years for those specific countries are naturally
-    excluded. I assume that the probability at which data for a specific
-    year-country combination will be missing is essentially random. This
-    assumption may be violated if countries that are systemically
-    difficult to obtain data for (such as Somalia or the Central African
-    Republic) is also correlated with other covariates and or $CO_2$
-    emissions.
 ```{=latex}
 \end{doublespace}
 ```
@@ -236,38 +178,14 @@ variables such as economic growth that are linked to higher proportions
 of women becoming elected---I lag the treatment variable of interest,
 $W_{ct}$, the average proportion of women in national legislature for
 country $c$ during year $t$ one year. This implies that any change in
-$Y_{ct}$ will inherently come *after* a change in $W_{ct}$. While I do
-not focus on specific regulatory practices within this paper, effective
-climate policy would consist of enacting particular policies and
-regulations that would reduce the $CO_2$ emissions by economic
-constraint. Hence, as a matter of the causal chain of inference, it
-could be that increased proportions of women in government could
-(causally) affect economic performance within a country at time $t$.
-Thus, to establish the causal chain of inference, I infer: $$
-\sum_{p=2}^PX_{ct-p}\rightarrow W_{ct-1}\rightarrow Y_{ct}
-$$ Where $X_{ct-p}$ is a matrix of controls related to economic growth.
-For the same reason the $W_{ct}$ is lagged one year to ensure that a
-change in $Y_{ct}$ comes after a change in $W_{ct}$, I include a series
-of autoregressive lags in the economic controls (starting at lag 2) to
-ensure that changes in $W_{ct-1}$ occur *after* changes in economic
-development. A priori, I set $P=5$ in my econometric model to control
-for economic lags in a country. For this two-stage
-regression, $X_{ct-p}$ consists of logged GDP and logged population for
-a country at year $t$[^12].
-
-[^12]: A further analysis could (and should) include further economic
-    controls that may affect $W_{ct-1}$ such as fertility rate, etc.
-```{=latex}
-\end{doublespace}
-```
-
-```{=latex}
-\begin{doublespace}
-```
-In the two-stage design, I further suspect that there exists some
+$Y_{ct}$ will inherently come *after* a change in $W_{ct}$. In the two-stage design, I further suspect that there exists some
 endogeneity in $W_{ct}$[^13]. Both $CO_2$ emissions and women's
 representation in government are highly correlated with
-industrialization and development. While $X_{ct}$ can eliminate some of
+industrialization and development. While I do
+not focus on specific regulatory practices within this paper, an a priori assumption could be that effective
+climate policy would consist of enacting particular policies and
+regulations that would reduce the $CO_2$ emissions by economic
+constraint. Hence, I include a sequence of matrices of autoregressive economic controls, represented by $\sum_{p=2}^PX_{ct-p}$ (where $p$ is the $p$th lag of the economic covariate[^12]). I include logged GDP and logged population in $X_{ct-p}$ (refer to [A3](#a3) to find out about why these controls are included in this way). While $X_{ct}$ can eliminate some of
 the endogeneity of $W_{ct}$ by including economic controls, these
 covariates alone are not enough to explain a country's development and
 how it interacts with how women are elected into national legislatures.
@@ -283,6 +201,7 @@ disproportionately such that women in these countries are more compelled
 to run for office and enact effective climate policies, then the
 estimand for $\delta$ will be biased in the negative direction.
 
+[^12]: A priori I set $P=5$, the total number of lags on all the economic covariate controls.
 [^13]: Mathematically, with endogeneity in the treatment variable, I
     assume
     $\exists \quad c_0, t_0 \quad s.t. \quad \mathbb{E}[W_{c_0t_0-1}\epsilon_{c_0t_0}]\neq0$.
@@ -300,7 +219,7 @@ has been to use the number of years since the country granted suffrage
 (Mavisakalyan & Tarverdi, 2019). I use a similar instrumental variable
 design here. Let $Z_{ct-1}$ be the number of years since a country $c$ has
 granted suffrage (measured at year $t$, and lagged one year to align
-with $W_{ct}$). In the difference-in-difference design, I use 62 country-fixed effects
+with $W_{ct-1}$). In the difference-in-difference design, I use 62 country-fixed effects
 (omitting the Qatar and Iraq dummies due to colinearity). After lagging
 $W_{ct}$ one year, I am left with data spanning 1998-2022, thus,
 including year-fixed effects, I also omit 1998 for colinearity. I
@@ -357,7 +276,7 @@ z.ci = (z.beta + c(-1,1)*z.se*qnorm(0.975)) %>% round(5)
 \begin{doublespace}
 ```
 Mavisakalyan and Tarverdi, although make use of a cross-sectional data
-set, to their credit, report that, "an IV estimation can be potentially
+set, report that, "an IV estimation can be potentially
 more convincing in a dataset that varies over time" (161). This is
 precisely what I employ here. I will expand on the research that uses
 years since suffrage as an instrument (Grier and Maldonado, 2015; Hicks
@@ -400,11 +319,7 @@ suffrage and the types of resources the country typically consumes.
 Critically, I assume monotonicity: the longer a country has passed from
 the year it granted suffrage, the more, on average, women are elected
 into national legislatures. I assume that there are no countries for
-which this trend reverses---though there may be countries that always
-elect women at high rates (always-takers) or always elect women at low
-rates (never-takers) regardless of when suffrage was granted; the fact
-that the instrument may have a weak effect for some countries is
-tolerable. The monotonicity assumption may be violated if women become
+which this trend reverses[^11]. The monotonicity assumption may be violated if women become
 less interested in politics over time for certain countries such that
 their participation decreases and hence the average proportion of women
 in national legislatures decrease with respect to years since suffrage
@@ -420,6 +335,8 @@ included covariates, and not because of the instrument[^17].
 [^15]: To assert this, one would have to see a distinct pattern
     between the periods of when women were granted suffrage and other metrics associated with carbon-intensive resource use such
     as oil exports.
+    
+[^11]: Though there may be countries that always elect women at high rates (always-takers) or always elect women at low rates (never-takers) regardless of when suffrage was granted; the fact that the instrument may have a weak effect for some countries is tolerable.
 
 [^16]: Additionally, monotonicity may be violated if obstacles to
     women's ability to participate in democratic elections become more
@@ -449,9 +366,7 @@ per capita for each country would have followed the same trend over time
 as the other countries that did not elect more (or less) women in
 national legislatures at that specific time. Since my treatment variable
 ($W_{ct-1}$) is continuous, the parallel trends assumption is hard to
-verify or even visually asses. However, I assume no other events or
-factors are influencing $CO_2$ emissions per capita differently across
-different countries over time. I assume no unobserved heterogeneity; my
+verify or even visually asses. I assume no unobserved heterogeneity; my
 estimate is robust to omitted covariates---this assumption is satisfied
 if we believe in the exclusion restriction of our instrumental variable
 (equation (3)). Following Bertrand et. al (2004), I cluster standard errors by
@@ -511,11 +426,7 @@ country at year $t$ seems Poisson-distributed[^21], however, upon
 partialling out the regressand for fixed effects, the response variable
 could be reasonably modeled as a Normal random vector[^22]. The goal of
 this placebo regression is to reason that there is a signal in the
-treatment on per capita $CO_2$ emissions. By using my identification
-strategy outlined previously, I hope to show that mechanically, there is
-something within the (local) causal chain that influences $CO_2$
-emissions to decrease when the average proportion of women in national
-legislatures increase. If the gender composition of national
+treatment on per capita $CO_2$ emissions. If the gender composition of national
 legislatures isn't influencing the number of natural disasters that
 occur within a country, this supports the theory that I did not obtain
 the regression results in the original regression by random chance.
@@ -581,7 +492,7 @@ implications, it is also interesting that the GDP from two years prior
 (or equivalently, one year prior to when women are elected into office),
 is significantly positive, indicating that either (i) economic growth
 facilitates higher probabilities of women being elected into office
-(supporting my thesis for a causal chain of inference), or (ii) use of
+(supporting my thesis for a causal chain of inference ([A3](#a3))), or (ii) use of
 carbon-intensive resources may promote economic growth in terms of GDP,
 and, if externalities placed on women are significant, encourage women
 to run for office to alleviate the very same externalities that
@@ -609,8 +520,7 @@ the national legislature, we see lower per capita $CO_2$ emissions.
 ```{=latex}
 \begin{doublespace}
 ```
-This paper reaffirms the effect that was outlined by Mavisakalyan and
-Tarverdi. Utilizing a two-stage difference-in-difference econometric
+Utilizing a two-stage difference-in-difference econometric
 framework, as national legislatures in African and Arab nations witness
 higher concentrations of women we see significantly lower per capita
 $CO_2$ emissions. While the exact mechanism through which women's
@@ -622,9 +532,7 @@ environmental benefits alongside broader societal advancements. While
 this study focused on the local average treatment effect across
 countries, future research should dive deeper into specific economic
 policy interactions and their implications on women in government and
-climate change. Furthermore, investigating the specific policies enacted
-by legislatures with higher female representation can shed light on the
-mechanisms at play. This study underscores the importance of considering
+climate change. This study underscores the importance of considering
 gender equality within climate change mitigation strategies.
 Understanding how women's leadership shapes environmental policy is
 crucial for developing more effective strategies to achieve a
@@ -655,8 +563,67 @@ the victims of death or injury in the case of extreme weather events
 ```{=latex}
 \end{doublespace}
 ```
+## A2 - Details on Data Collection {#a2}
+```{=latex}
+\begin{doublespace}
+```
+The IPU Data: Not every government maintains the same structure of government, however, the IPU
+distinguishes between women elected into the lower house and upper house
+levels of government throughout multiple periods. I take the
+average proportion of women holding office in the national legislature
+overall in a given year by taking a weighted average of the two
+houses. Econometrically, this assumes that on average, the power that women are given in each house of national legislature is equal to the 'weight' of women in that chamber of legislature: In other
+words, assuming a fair political system, I assume no chamber can systemically dominate the other chamber. A graphical illustration of the average proportion of women in the national legislatures for each country in my sample can be seen in Figure 1.
 
+Suffrage Data: Not all countries in Africa and the Middle East treat women equally. Even when suffrage is granted, it is not granted universally. Thus, the instrument may not influence the proportion of women in government the same in every country. This does not discredit my econometric analysis, however, so long as the monotonicity assumption of my instrument is met. However, I exclude obvious anomalies in my analytic sample. See Table 2 for summary statistics for each country in my sample. In my sample, the United Arab Emirates (UAE) and Saudia Arabia are excluded because they don't give full suffrage to women: The UAE held
+its first national elections in 2006, but only a select amount of men and women were eligible to participate (Schaeffer, 2020). Saudi Arabia doesn't hold national elections. Women are, however, enfranchised at the local level government levels. This leaves us with a total of 64 different countries in the analytic sample.
+
+Notably, the data is left as an unbalanced panel data set (Refer to Table 2). The World Bank does not have GDP or population data for every single year of every single country in the data, and critically, the IPU also notes that it cannot reliably retrieve the number of women in national legislatures for every year. These years for those specific countries are naturally excluded. I assume that the probability at which data for a specific year-country combination will be missing is essentially random. This assumption may be violated if countries that are systemically difficult to obtain data for (such as Somalia or the Central African Republic) is also correlated with other covariates and or $CO_2$ emissions.
+```{=latex}
+\end{doublespace}
+```
+
+## A3 - Causal Chain of Inference {#a3}
+```{=latex}
+\begin{doublespace}
+```
+It could be that increased proportions of women in government could
+(causally) affect economic performance within a country at time $t$.
+Thus, to establish the causal chain of inference, I infer:
+$$
+\sum_{p=2}^PX_{ct-p}\rightarrow W_{ct-1}\rightarrow Y_{ct}
+$$
+Where $X_{ct-p}$ is a matrix of controls related to economic growth.
+For the same reason the $W_{ct}$ is lagged one year to ensure that a
+change in $Y_{ct}$ comes after a change in $W_{ct}$, I include a series
+of autoregressive lags in the economic controls (starting at lag 2) to
+ensure that changes in $W_{ct-1}$ occur *after* changes in economic
+development. A priori, I set $P=5$ in my econometric model to control
+for economic lags in a country. For this two-stage
+regression, $X_{ct-p}$ consists of logged GDP and logged population for
+a country at year $t$. A further analysis could (and should) include further economic
+controls that may affect $W_{ct-1}$ such as fertility rate, etc.
+```{=latex}
+\end{doublespace}
+```
 # Tables & Figures
+```{r summary_stats, echo=F}
+women.subset <- women %>% filter(year >= 1997)
+
+tibble(
+  Variable = c("CO2 Emissions Per Capita", "Proportion of Women in Gvt", "ln(GDP)", "ln(Population)", "Suffrage"),
+  Mean = c(mean(women.subset$co2, na.rm = T) %>% round(3) %>% format(scientific=F), mean(women.subset$womenrep, na.rm=T) %>% round(3) %>% format(scientific=F), mean(log(women.subset$gdp), na.rm=T) %>% round(), mean(log(women.subset$population), na.rm=T) %>% round(3) %>% format(scientific=F),
+           mean(women.subset$suffrage, na.rm=T) %>% round(3) %>% format(scientific=F)),
+    SD = c(sd(women.subset$co2, na.rm = T) %>% round(3) %>% format(scientific=F), sd(women.subset$womenrep, na.rm=T) %>% round(3) %>% format(scientific=F),
+           sd(log(women.subset$gdp), na.rm=T) %>% round(1), sd(log(women.subset$population), na.rm=T) %>% round(3) %>% format(scientific=F),
+           sd(women.subset$suffrage, na.rm=T) %>% round(3) %>% format(scientific=F)),
+    Min = c(min(women.subset$co2, na.rm = T) %>% round(3) %>% format(scientific=F), min(women.subset$womenrep, na.rm=T) %>% round(3) %>% format(scientific=F), min(log(women.subset$gdp), na.rm=T) %>% round(), min(log(women.subset$population), na.rm=T) %>% round(3) %>% format(scientific=F),
+           min(women.subset$suffrage, na.rm=T) %>% round(3) %>% format(scientific=F)),
+    Max = c(max(women.subset$co2, na.rm = T) %>% round(3) %>% format(scientific=F), max(women.subset$womenrep, na.rm=T) %>% round(3) %>% format(scientific=F), max(log(women.subset$gdp), na.rm=T) %>% round(1), max(log(women.subset$population), na.rm=T) %>% round(3) %>% format(scientific=F),
+           max(women.subset$suffrage, na.rm=T) %>% round(3) %>% format(scientific=F)),
+) %>% knitr::kable(caption = "Summary Statistics of Key Variables")
+```
+\newpage
 ```{r visuals, echo=F, warning=F, message=F, fig.align='center', fig.width=16, fig.height=16}
 label_data <- women %>%
   filter(year >= 1997) %>%
@@ -721,22 +688,7 @@ women %>% filter(year >= 1996) %>%
   theme(axis.text = element_text(size = 36))+
   theme_minimal()
 ```
-```{r summary_stats, echo=F}
-women.subset <- women %>% filter(year >= 1997)
-
-tibble(
-  Variable = c("CO2 Emissions Per Capita", "Proportion of Women in Gvt", "ln(GDP)", "ln(Population)", "Suffrage"),
-  Mean = c(mean(women.subset$co2, na.rm = T) %>% round(3) %>% format(scientific=F), mean(women.subset$womenrep, na.rm=T) %>% round(3) %>% format(scientific=F), mean(log(women.subset$gdp), na.rm=T) %>% round(), mean(log(women.subset$population), na.rm=T) %>% round(3) %>% format(scientific=F),
-           mean(women.subset$suffrage, na.rm=T) %>% round(3) %>% format(scientific=F)),
-    SD = c(sd(women.subset$co2, na.rm = T) %>% round(3) %>% format(scientific=F), sd(women.subset$womenrep, na.rm=T) %>% round(3) %>% format(scientific=F),
-           sd(log(women.subset$gdp), na.rm=T) %>% round(1), sd(log(women.subset$population), na.rm=T) %>% round(3) %>% format(scientific=F),
-           sd(women.subset$suffrage, na.rm=T) %>% round(3) %>% format(scientific=F)),
-    Min = c(min(women.subset$co2, na.rm = T) %>% round(3) %>% format(scientific=F), min(women.subset$womenrep, na.rm=T) %>% round(3) %>% format(scientific=F), min(log(women.subset$gdp), na.rm=T) %>% round(), min(log(women.subset$population), na.rm=T) %>% round(3) %>% format(scientific=F),
-           min(women.subset$suffrage, na.rm=T) %>% round(3) %>% format(scientific=F)),
-    Max = c(max(women.subset$co2, na.rm = T) %>% round(3) %>% format(scientific=F), max(women.subset$womenrep, na.rm=T) %>% round(3) %>% format(scientific=F), max(log(women.subset$gdp), na.rm=T) %>% round(1), max(log(women.subset$population), na.rm=T) %>% round(3) %>% format(scientific=F),
-           max(women.subset$suffrage, na.rm=T) %>% round(3) %>% format(scientific=F)),
-) %>% knitr::kable(caption = "Summary Statistics of Key Variables")
-
+```{r country_stats, echo=F}
 women.subset %>%
   group_by(country) %>%
   summarize(
