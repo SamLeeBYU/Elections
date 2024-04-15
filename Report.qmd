@@ -504,7 +504,7 @@ for substitute goods such as subsidies for alternative energy sources.
 These projects could lower $CO_2$ emissions while boosting a country's
 GDP. While this paper cannot investigate specific interactions between a
 country's economy, gender composition in the national government, and $CO_2$
-emissions, it seems clear (with high confidence), when more women enter
+emissions, it seems clear (with high confidence) that when more women enter
 the national legislature, we see lower per capita $CO_2$ emissions.
 
 [^23]: Notably, since the instrument is continuous, more heterogeneity
