@@ -1,6 +1,6 @@
 ---
-title: "Assessing the Asymptotic Properties of Proposed Cluster Robust Variances in a GMM Framework"
-subtitle: "An Applied Analysis to Propose a New CRVE for Instrumental Variables"
+title: "Cluster-Robust Variance Estimators for Instrumental Variables"
+subtitle: "Theory and Application in Assessing the Impact of Gender Representation on Carbon Emissions"
 author: "Sam Lee"
 format: pdf
 header-includes:
@@ -35,7 +35,7 @@ source("CRVE/simulate.R")
 ```{=latex}
 \begin{doublespace}
 ```
-Within applied econometrics, the practice of clustering standard errors by groups that are presumed to have errors correlated within the group but otherwise uncorrelated between other groups has invoked a series of large research on econometric methodology, especially within the past couple of decades. One recent paper in the literature outlines a guide to empirical practice using cluster-robust variance estimators (CRVEs) (MacKinnon et. al 2022). The authors of this paper assess three feasible CRVEs, with particular emphasis on a jackknife estimator. While the authors of this paper assert "for such models [with clustered data estimated by instrumental variables (IV)], neither the current state of econometric theory nor the available simulation evidence allows [the authors] to make recommendations with any confidence," this paper attempts to expand on the guide on empirical practice made by MacKinnon et. al and apply theory to an empirical analysis using instrumental variables. This paper examines what the effect of electing higher proportions of women in African and Arab nations has on yearly $CO_2$ emissions per capita using years since suffrage as an instrumental variable. To assess the validity of inference, I apply the proposed CRVE using a GMM estimation framework.
+Within applied econometrics, the practice of clustering standard errors by groups that are presumed to have errors correlated within the group but otherwise uncorrelated between other groups has invoked a series of large research on econometric methodology, especially within the past couple of decades. One recent paper in the literature outlines a guide to empirical practice using cluster-robust variance estimators (CRVEs) (MacKinnon et. al 2022). The authors of this paper assess three feasible CRVEs, with particular emphasis on a jackknife estimator. While the authors of this paper assert "for such models [with clustered data estimated by instrumental variables (IV)], neither the current state of econometric theory nor the available simulation evidence allows [the authors] to make recommendations with any confidence," this paper attempts to expand on the guide on empirical practice made by MacKinnon et. al and apply theory to an empirical analysis using instrumental variables. This paper examines what the effect of electing higher proportions of women in African and Arab nations has on yearly $CO_2$ emissions per capita using years since suffrage as an instrumental variable. To assess the validity of inference, I first propose three feasible cluster-robust variance estimators for a GMM framework in the just-identified case following MacKinnon et. al. I apply the proposed estimators to an empirical example to assess the credibility of inference and to evaluate their long-run performance using a Monte Carlo analysis. I find that one particular estimator may possibly perform more consistently than the others, while the others tend to under reject. 
 ```{=latex}
 \end{doublespace}
 ```
@@ -43,7 +43,7 @@ Within applied econometrics, the practice of clustering standard errors by group
 ```{=latex}
 \begin{doublespace}
 ```
-The most well-known CRVE used in econometric practice is by far the Liang-Zeger estimator (1986). This formula relies on the asymptotic properties of the OLS estimator. Furthermore, one novel critique of the difference-in-differences (DiD) estimator argues that applied econometric approaches using a DiD approach will typically underestimate the standard deviation of treatment effect without using a proper CRVE (Bertrand et. al 2004). Notably, this paper uses a Monte Carlo analysis to generate new random vectors for the response variables to illustrate the empirical coverage of CRVE estimators for both a large and small amount of clusters. In this paper, I will first introduce the CRVEs that MacKinnon et. al proposes as standard practice in applied work. Critically, since the CRVEs used in mainstream practice rely on the asymptotic properties of the OLS estimator, I attempt to parallel the work to a generalized method of moments (GMM) framework suitable for instrumental variables. Then, I will briefly introduce the applied example I use to illustrate the empirical coverage of my CRVE. In this paper, I analyze the effect of how electing higher proportions of women in African and Arab countries can decrease yearly per capita $CO_2$ emissions. I discuss why this is an important question both socially and econometrically. I will then explain the data-generating process I will use for my Monte Carlo analysis, my results, and then conclude.
+The most well-known CRVE used in econometric practice is by far the Liang-Zeger estimator (1986). This formula relies on the asymptotic properties of the OLS estimator. Furthermore, one novel critique of the difference-in-differences (DiD) estimator argues that applied econometric approaches using a DiD approach will typically underestimate the standard deviation of treatment effect without using a proper CRVE (Bertrand et. al 2004). Notably, the paper from Bertand et. al uses a Monte Carlo analysis to generate new random vectors for the response variables to illustrate the empirical coverage of CRVE estimators for both a large and small amount of clusters. In this paper, I will first introduce the CRVEs that MacKinnon et. al proposes as standard practice in applied work. Critically, since the CRVEs used in mainstream practice rely on the asymptotic properties of the OLS estimator, I attempt to parallel the work to a generalized method of moments (GMM) framework suitable for instrumental variables. The objective of this paper is to assess the performance of these proposed estimators and the implications on an important issue in society. In this paper, I analyze the effect of how electing higher proportions of women in African and Arab countries can decrease yearly per capita $CO_2$ emissions. I discuss why this is an important question both socially and econometrically. I will then explain the data-generating process I will use for my Monte Carlo analysis, my results, and then conclude.
 ```{=latex}
 \end{doublespace}
 ```
@@ -697,7 +697,8 @@ original.Y <- data.frame(x=Y) %>%
 boostrap.Y <- data.frame(x=DGP(clusters=clusters, Y, cluster=F)) %>%
   ggplot(mapping=aes(x=x))+
   geom_histogram(binwidth = 1, fill = "#44CCAA", color = "black") +
-    labs(title = expression("Bootstrap Sample of "~Y[ct]), x = "Yearly (Gigatons of) per Capita Carbon Emissions", y = "Frequency") +
+    labs(title = expression("Bootstrap Sample of "~Y[ct]), x = "Yearly (Gigatons of) per Capita Carbon Emissions", y = "Frequency",
+         caption = "Figure 4 - Comparison between original dependent variable and bootstrapped dependent variable.") +
     theme_minimal() +
     theme(plot.title = element_text(hjust = 0.5),
           axis.text = element_text(size = 10),
@@ -713,18 +714,35 @@ original.Y + boostrap.Y
 ```
 The DGP simulates placebo vectors for $Y_{ct}$ ($\overset{\circ}{Y}_{ct}$). If the results from the main regression were not obtained by random chance, we would expect that $\overset{\circ}{Y}_{ct}$ would testify to this effect. Thus, on average---assuming the standard errors are sized correctly---using a 95% confidence interval, we would expect the empirical coverage of a significant $\hat{\delta}$ to approach 5% using $\overset{\circ}{Y}_{ct}$ in place of $Y_{ct}$. However, if the results were obtained by some misspecification or some other unobserved factor, it may be that the empirical coverage may not converge to 5%, and the GMM variance estimators may fail to deliver on their promise. In such a scenario, we will not be able to put much confidence in the two-stage difference-in-differences regression results. Simultaneously, if we can put our confidence in the regression results, we can also evaluate the empirical performance of the proposed cluster-robust variance estimators and determine which estimator may be preferential in a just-identified GMM setting that uses instrumental variables.
 
-I run 10,000 simulations, generating a new $\overset{\circ}{Y}_{ct}$ for each simulation. I then calculate the estimates for $\delta$ (the local average treatment effect of interest) and the respective 95% confidence intervals using the three proposed CRVEs in Section II as well as the 95% confidence interval using the equation for $\hat{V}$, which assumes a homoskedastic variance on $\epsilon_{ct}$, as a baseline measurement. Notably, to calculate $\overset{iv}{CV}_{2}$ and $\overset{iv}{CV}_{3}$ requires the calculation of $\overset{iv}{M}_{gg}$. In order to calculate this matrix, it is requisite to partial out fixed effects to avoid singularity (MacKinnon et. al, 2022).
+I run 10,000 simulations, generating a new $\overset{\circ}{Y}_{ct}$ for each simulation. I then calculate the estimates for $\delta$ (the local average treatment effect of interest) and the respective 95% confidence intervals using the three proposed CRVEs in Section III as well as the 95% confidence interval using the equation for $\hat{V}$, which assumes a homoskedastic variance on $\epsilon_{ct}$, as a baseline measurement. Notably, to calculate $\overset{iv}{CV}_{2}$ and $\overset{iv}{CV}_{3}$ requires the calculation of $\overset{iv}{M}_{gg}$. In order to calculate this matrix, it is requisite to partial out fixed effects to avoid singularity (MacKinnon et. al, 2022).
 ```{=latex}
 \end{doublespace}
 ```
 ## Simulation Results
-```{r simulation, echo=F, eval=F}
-library(xtable)
-#Run simulation
-sims <- simulate.CRVE(10000, Y.tilde, clusters, bootstrap.cluster = F)
-#Format table to latex
-sims.table <- xtable(sims)
-coverage(sims)
+```{r simulation, echo=F, fig.width=14, fig.height=8}
+# library(xtable)
+# #Run simulation
+# sims <- simulate.CRVE(10000, Y.tilde, clusters, bootstrap.cluster = F)
+# #Format table to latex
+# sims.table <- xtable(sims)
+# coverage(sims)
+
+#save(sims, file="CRVE/sims.RData")
+
+load("CRVE/sims.RData")
+
+data.frame(x=sapply(sims[,1]+sims[,2], median)) %>%
+  ggplot(mapping=aes(x=x))+
+  geom_histogram(binwidth = 5, fill = "#44CCAA", color = "black") +
+    labs(title = expression("Distribution of "~hat(delta)), x = expression(hat(delta)), y = "Frequency",
+         caption = "Figure 5 - Sample distribution of the simulated estimators for the local average treatment effect") +
+  geom_vline(xintercept = 0, linetype=2)+
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5),
+          axis.text = element_text(size = 10),
+          axis.title = element_text(size = 12),   
+          panel.grid.minor = element_blank(),    
+          panel.grid.major = element_line(color = "lightgrey"))
 ```
 ```{r sim-results, fig.align='center', echo=F, warning=F, results='asis'}
 cat(readLines("CRVE/sim_results.tex"), sep = "\n")
