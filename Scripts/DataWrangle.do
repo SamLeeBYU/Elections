@@ -5,6 +5,7 @@ Author: Sam Lee
 This script takes in all of our data sets and merges them into one cleaned data set for data analysis
 */
 
+//Set working directory
 cd "C:\Users\slee039\Box\ECON 398\Final Project"
 
 //Load in suffrage data for each country to create instrument

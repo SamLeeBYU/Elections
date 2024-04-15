@@ -5,6 +5,7 @@ Author: Sam Lee
 This script performs an econometric analysis to identify the local average treatment effect that electing more women in African and Arab countries has on CO2 emissions per capita
 */
 
+//Set working directory
 cd "C:\Users\slee039\Box\ECON 398\Final Project"
 
 //clean and load in the data for analysis
@@ -58,20 +59,6 @@ ivregress 2sls co2 lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag), c
 //Save results to a latex table
 ssc install estout
 esttab using "regression_results_raw.tex", replace ci
-
-sort countryid
-gen rsamp = floor(_N * runiform())+1
-gen cl_bootstrap = co2[rsamp]
-drop rsamp
-
-//placebo regression
-ivregress 2sls cl_bootstrap lgdp* lpopulation* _Iyear* _Icountry* (womenrep_lag=z_lag), cluster(countryid)
-
-/*one way CV1 and CV3 */
-adopath + "C:\Users\slee039\Box\ECON 398\Final Project\Resources\MNW-guide-replic-do-files"
-
-summclust womenrep_lag, yvar(co2) xvar(lgdp* lpopulation*) fevar(_Iyear* _Icountry*) ///
- cluster(countryid) rho(0.5) jack 
 
 //Run placebo test
 do Scripts/placebo.do

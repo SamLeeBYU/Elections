@@ -9,6 +9,7 @@ I employ a two-stage least squares regression, after partialling out fixed effec
 Theoretically, with this as a placebo, there should be a very weak/zero effect. I provide this as evidence that my results are significant.
 */
 
+//Set working directory
 cd "C:\Users\slee039\Box\ECON 398\Final Project"
 
 use Data/womenrep.dta, clear

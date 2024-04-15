@@ -22,15 +22,15 @@ simulate.CRVE <- function(n, Y, clusters, bootstrap.cluster=F){
   return(sims.ci)
 }
 
-coverage <- function(sims){
-  coverages = c()
+rejection <- function(sims){
+  rejections = c()
   k = 1
   for(i in 1:(ncol(sims)/2)){
-    coverages[i] = sum(0 < sims[,k] & 0 < sims[,k+1] | 
+    rejections[i] = sum(0 < sims[,k] & 0 < sims[,k+1] | 
                          (0 > sims[,k] & 0 > sims[,k+1]))/nrow(sims)
     k = k+2
   }
-  names(coverages) = colnames(sims) %>%
+  names(rejections) = colnames(sims) %>%
     unique()
-  return(coverages)
+  return(rejections)
 }

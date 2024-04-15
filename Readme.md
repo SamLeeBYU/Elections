@@ -26,7 +26,10 @@ git clone "https://github.com/SamLeeBYU/Elections"
 ```
 cd Elections
 ```
-3) Run [Scripts/analysis.do](Scripts/analysis.do) in Stata
+3) Change the Working Directories
+ - In each of the Stata files change the first lines to reflect the directory that you downloaded the files into.
+(line 9 in [Scripts/DataWrangle.do](Scripts/DataWrangle.do), line 9 in [Scripts/analysis.do](Scripts/analysis.do), and line 13 [Scripts/placebo.do](Scripts/placebo.do); this should be the same directory that you navigate into in step 2).
+4) Run [Scripts/analysis.do](Scripts/analysis.do) in Stata
 ```
 do Scripts/analysis.do
 ```
