@@ -733,6 +733,15 @@ I run 10,000 simulations, generating a new $\overset{\circ}{Y}_{ct}$ for each si
 
 load("CRVE/sims.RData")
 
+# n = 1499; G = 64; k = ncol(X.tilde)
+# lz.betas = sapply(sims[,1]+sims[,2], median)
+# lz.v = ((G-1)*(n-k))/(G*(n-1))*n*((sims[,2]-lz.betas)/qnorm(0.975))^2
+# lz.stata <-matrix(c(lz.betas-qnorm(0.975)*sqrt(n^-1*lz.v),
+#                         lz.betas+qnorm(0.975)*sqrt(n^-1*lz.v)),
+#                       nrow=10000, ncol=2)
+# colnames(lz.stata) <- c("CR1", "CR1")
+# coverage(lz.stata)
+
 sims.delta <- data.frame(x=sapply(sims[,1]+sims[,2], median)) %>%
   ggplot(mapping=aes(x=x))+
   geom_histogram(binwidth = 5, fill = "#44CCAA", color = "black") +
