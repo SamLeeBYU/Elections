@@ -767,7 +767,7 @@ investigation, these findings hold significant policy implications. It seems cle
 the national legislature, we see lower per capita $CO_2$ emissions.
 
 [^18]: The 95% confidence interval using $\overset{iv}{CV}_{1}$ yields (-164.8728, -50.8122), or, on the 1% scale, (-1.65, -5.08).
-[^19]: Curiously, the authors of MacKinnon et. al use a critical value $ = t_{1-\alpha/2, df=G-1}$, whereas Stata assumes a Normal critical value. Simulation results were calculated using Normal critical values. Using a critical value adjusted for $G$ such as suggested by MacKinnon et. al yields slightly lower rejection rates in the simulation.
+[^19]: Curiously, the authors of MacKinnon et. al use a critical value of $t_{1-\alpha/2, df=G-1}$, whereas Stata assumes a Normal critical value. Simulation results were calculated using Normal critical values. Using a critical value adjusted for $G$ such as suggested by MacKinnon et. al yields slightly lower rejection rates in the simulation.
 
 ```{=latex}
 \end{doublespace}
@@ -777,7 +777,7 @@ the national legislature, we see lower per capita $CO_2$ emissions.
 
 Bertrand, M., Duflo, E., & Mullainathan, S. (2004). How much should we
 trust differences-in-differences estimates?
-<https://www.nber.org/system/files/working_papers/w31063/w31063.pdf>
+<https://www.jstor.org/stable/25098683>
 
 Bell, R.M.m McCaffrey, D.F., (2002). Bias reduction in standard errors for linear regression with multi-stage samples. Surv. Methodol. 28, 169-181.
 

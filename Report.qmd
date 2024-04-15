@@ -803,7 +803,7 @@ cat(readLines("placebo_results.tex"), sep = "\n")
 
 Bertrand, M., Duflo, E., & Mullainathan, S. (2004). How much should we
 trust differences-in-differences estimates?
-<https://www.nber.org/system/files/working_papers/w31063/w31063.pdf>
+<https://www.jstor.org/stable/25098683>
 
 Centre for Research on the Epidemiology of Disasters (CRED). (2023).
 EM-DAT: The Emergency Events Database \[database\]. Retrieved
