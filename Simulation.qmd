@@ -43,7 +43,7 @@ Within applied econometrics, the practice of clustering standard errors by group
 ```{=latex}
 \begin{doublespace}
 ```
-The most well-known CRVE used in econometric practice is by far the Liang-Zeger estimator (1986). This formula relies on the asymptotic properties of the OLS estimator. Furthermore, one novel critique of the difference-in-differences (DiD) estimator argues that applied econometric approaches using a DiD approach will typically underestimate the standard deviation of treatment effect without using a proper CRVE (Bertrand et. al 2004). Notably, the paper from Bertand et. al uses a Monte Carlo analysis to generate new random vectors for the response variables to illustrate the empirical coverage of CRVE estimators for both a large and small amount of clusters. In this paper, I will first introduce the CRVEs that MacKinnon et. al proposes as standard practice in applied work. Critically, since the CRVEs used in mainstream practice rely on the asymptotic properties of the OLS estimator, I attempt to parallel the work to a generalized method of moments (GMM) framework suitable for instrumental variables. The objective of this paper is to assess the performance of these proposed estimators and the implications on an important issue in society. In this paper, I analyze the effect of how electing higher proportions of women in African and Arab countries can decrease yearly per capita $CO_2$ emissions. I discuss why this is an important question both socially and econometrically. I will then explain the data-generating process I will use for my Monte Carlo analysis, my results, and then conclude.
+The most well-known CRVE used in econometric practice is by far the Liang-Zeger estimator (1986). This formula relies on the asymptotic properties of the OLS estimator. Furthermore, one novel critique of the difference-in-differences (DiD) estimator argues that applied econometric approaches using a DiD approach will typically underestimate the standard deviation of treatment effect without using a proper CRVE (Bertrand et. al 2004). Notably, the paper from Bertand et. al uses a Monte Carlo analysis to generate new random vectors for the response variables to illustrate the empirical coverage of CRVE estimators for both a large and small amount of clusters. In this paper, I will first introduce the CRVEs that MacKinnon et. al propose as standard practice in applied work. Critically, since the CRVEs used in mainstream practice rely on the asymptotic properties of the OLS estimator, I attempt to parallel the work to a generalized method of moments (GMM) framework suitable for instrumental variables. The objective of this paper is to assess the performance of these proposed estimators and the implications on an important issue in society. In this paper, I analyze the effect of how electing higher proportions of women in African and Arab countries can decrease yearly per capita $CO_2$ emissions. I discuss why this is an important question both socially and econometrically. I will then explain the data-generating process I will use for my Monte Carlo analysis, my results, and then conclude.
 ```{=latex}
 \end{doublespace}
 ```
@@ -76,17 +76,17 @@ While this paper serves a purpose to not reinvent the wheel, and rather, works t
 \end{doublespace}
 ```
 $$
-\sqrt{n}(\beta_0-\beta)\underset{d}{\rightarrow}N(0,(X'X)^{-1}\mathbb{E}[x_ix_i'u_i^2](X'X)^{-1})
+\sqrt{n}(\hat{b}-\beta_0)\underset{d}{\rightarrow}N(0,(\mathbb{E}[X_iX_i']^{-1}\mathbb{E}[X_iX_i'u_i^2]\mathbb{E}[X_iX_i']^{-1})
 $$
 ```{=latex}
 \begin{doublespace}
 ```
-Since $X$ is merely the stacked matrix of the clusters, the only difference between the asymptotic properties of $\beta$ in (1) and (2) is the calculation of $\mathbb{E}[x_ix_i'u_i^2]$. Empirically, for (1), this can be estimated with the sample mean (robust only to unknown forms of heteroskedasticity):
+Since $X$ is merely the stacked matrix of the clusters, the only difference between the asymptotic properties of $\hat{b}$ in (1) and (2) is the calculation of $\mathbb{E}[x_ix_i'u_i^2]$. Empirically, for (1), this can be estimated with the sample mean (robust only to unknown forms of heteroskedasticity):
 ```{=latex}
 \end{doublespace}
 ```
 $$
-\frac{1}{n}\sum_{i=1}^nx_ix_i'\hat{u}_i^2
+\frac{1}{n}\sum_{i=1}^nX_iX_i'\hat{u}_i^2
 $$
 ```{=latex}
 \begin{doublespace}
@@ -96,19 +96,19 @@ Thus, assuming data are divided into $G$ \# of disjoint groups, a convenient way
 \end{doublespace}
 ```
 $$
-\frac{1}{n}\sum_{i=1}^nx_ix_i'\hat{u}_i^2=\frac{1}{n}\sum_{g=1}^GX_g'\hat{u}_g\hat{u}_g'X_g
+\frac{1}{n}\sum_{i=1}^nX_iX_i'\hat{u}_i^2=\frac{1}{n}\sum_{g=1}^GX_g'\hat{u}_g\hat{u}_g'X_g
 $$
 ```{=latex}
 \begin{doublespace}
 ```
 Of course, the equality won't hold if there is correlation *within* each cluster, hence the need to use an estimator for a cluster-robust variance. Thus, the first CRVE[^20] MacKinnon provide follows directly as,
 
-[^20]: Note that this is the variance of the random variable, $\sqrt{n}(\beta_0-\beta)$.
+[^20]: Note that this is the variance of the random variable, $\sqrt{n}(\hat{b}-\beta_0)$.
 ```{=latex}
 \end{doublespace}
 ```
 $$
-\text{CV}_1: \frac{G(N-1)}{(G-1)(N-k)}(X'X)^{-1}(\frac{1}{n}\sum_{g=1}^G\hat{s}_g\hat{s}_g')(X'X)^{-1};\quad\hat{s}_g=X_g'\hat{u}_g
+\text{CV}_1: n\frac{G(N-1)}{(G-1)(N-k)}(X'X)^{-1}(\sum_{g=1}^G\hat{s}_g\hat{s}_g')(X'X)^{-1};\quad\hat{s}_g=X_g'\hat{u}_g
 $$
 ```{=latex}
 \begin{doublespace}
@@ -121,10 +121,10 @@ Where a correction for degrees of freedom is applied. While MacKinnon, et. al no
 \end{doublespace}
 ```
 $$
-\text{CV}_2: (X'X)^{-1}(\frac{1}{n}\sum_{g=1}^{G}\grave{s}_g\grave{s}_g')(X'X)^{-1}; \quad \grave{s}_g=X'M_{gg}^{-1/2}\hat{u}_g;\quad M_{gg}=I_{N_g}-X_g(X'X)^{-1}X_g'
+\text{CV}_2: n(X'X)^{-1}(\sum_{g=1}^{G}\grave{s}_g\grave{s}_g')(X'X)^{-1}; \quad \grave{s}_g=X'M_{gg}^{-1/2}\hat{u}_g;\quad M_{gg}=I_{N_g}-X_g(X'X)^{-1}X_g'
 $$
 $$
-\text{CV}_3: \frac{G-1}{G}(X'X)^{-1}(\frac{1}{n}\sum_{g=1}^{G}\acute{s}_g\acute{s}_g')(X'X)^{-1}; \quad \acute{s}_g=X'M_{gg}^{-1}\hat{u}_g
+\text{CV}_3: n\frac{G-1}{G}(X'X)^{-1}(\sum_{g=1}^{G}\acute{s}_g\acute{s}_g')(X'X)^{-1}; \quad \acute{s}_g=X'M_{gg}^{-1}\hat{u}_g
 $$
 
 # III. A Cluster-Robust Variance Estimator for Instrumental Variables
@@ -157,15 +157,15 @@ Assuming conditions for identification are met[^2], for data generated with $\be
 \end{doublespace}
 ```
 $$
-\sqrt{n}(\beta_0-\beta)\underset{d}{\rightarrow}N(0,\left[G(\beta)\mathbb{E}[m_i(\beta)m_i(\beta)']^{-1}G(\beta)' \right]^{-1})\implies
+\sqrt{n}(\hat{b}-\beta_0)\underset{d}{\rightarrow}N(0,\left[G(\beta)\mathbb{E}[m_i(\beta)m_i(\beta)']^{-1}G(\beta)' \right]^{-1})\implies
 $$
 $$
-\sqrt{n}(\beta_0-\beta)\underset{d}{\rightarrow}N(0, \left[\mathbb{E}[(X_iZ_i)]\mathbb{E}[Z_iZ_i'u_i^2]^{-1}\mathbb{E}[(X_iZ_i)' \right]^{-1})
+\sqrt{n}(\hat{b}-\beta_0)\underset{d}{\rightarrow}N(0, \left[\mathbb{E}[(X_iZ_i)]\mathbb{E}[Z_iZ_i'u_i^2]^{-1}\mathbb{E}[(X_iZ_i)' \right]^{-1})
 $$
 ```{=latex}
 \begin{doublespace}
 ```
-The objective of this section will be to outline a reasonable cluster-robust variance estimator following the research that has been done on this topic. Moving from equation (1) to a two-stage least squares design, assume data is generated from the following just-identified two-stage least squares process, where $W_i$ is endogenous. Assume exclusion, independence, and relevance conditions are all met for the instrument $z_i$. Let the empirical just-identified two-stage regression be characterized as
+The objective of this section will be to outline a reasonable cluster-robust variance estimator following the research that has been done on this topic. Moving from equation (1) to a two-stage least squares design, assume data is generated from the following just-identified two-stage least squares process, where $w_i$ is endogenous. Assume exclusion, independence, and relevance conditions are all met for the instrument $z_i$. Let the empirical just-identified two-stage regression be characterized as
 ```{=latex}
 \end{doublespace}
 ```
@@ -173,7 +173,7 @@ $$
 (3)\quad w_i=z_i'\lambda+v_i
 $$
 $$
-(4)\quad y_i=\left[ w_i | q_i \right]'\left[ \frac{\delta}{\alpha} \right] + \epsilon_i = x_i'\beta+\epsilon_i
+(4)\quad y_i=\left[ w_i | q_i \right]'\left[ \delta\over\alpha \right] + \epsilon_i = x_i'\beta+\epsilon_i
 $$
 ```{=latex}
 \begin{doublespace}
@@ -188,7 +188,7 @@ Where $\delta$ is the (local average) treatment effect of interest on $w_i$. Let
 ```{=latex}
 \begin{doublespace}
 ```
-Thus, let the variance estimator of interest from the GMM framework to be,
+Thus, let the variance estimator of interest from the GMM framework be defined as,
 ```{=latex}
 \end{doublespace}
 ```
@@ -408,7 +408,7 @@ tibble(
 ```{=latex}
 \begin{doublespace}
 ```
-One potential problem with
+One potential problem with the
 data is that I do not account for country-specific government
 intricacies that could prevent women or a legislature from
 passing effective climate policy---such as not accounting for government
@@ -654,7 +654,7 @@ cat(readLines("CRVE/crve-intervals.tex"), sep = "\n")
 ```{=latex}
 \begin{doublespace}
 ```
-The natural question that follows is whether or not we can trust the inference results on this regression output. Empirical results from Bertrand et. al (2004) suggest that the homoskedasticity assumption on $\epsilon_ct$ causes us to drastically understate the standard errors since $CO_2$ emissions are correlated within a country over time. Even if higher concentrations of women in national legislatures decrease carbon emissions through regulatory practice, there are reasonable arguments to suggest that the effects of those regulatory practices may not be fruit-bearing until years later down the road. After all, industries may need time to adjust their carbon-intensive practices into compliance. Thus, if the logic to cluster the standard errors by country prevails, which cluster-robust variance estimator should we use? Can we trust our inferences? I examine this question in the next section.
+The natural question that follows is whether or not we can trust the inference results on this regression output. Empirical results from Bertrand et. al (2004) suggest that the homoskedasticity assumption on $\epsilon_{ct}$ causes us to drastically understate the standard errors since $CO_2$ emissions are correlated within a country over time. Even if higher concentrations of women in national legislatures decrease carbon emissions through regulatory practice, there are reasonable arguments to suggest that the effects of those regulatory practices may not be fruit-bearing until years later down the road. After all, industries may need time to adjust their carbon-intensive practices into compliance. Thus, if the logic to cluster the standard errors by country prevails, which cluster-robust variance estimator should we use? Can we trust our inferences? I examine these questions in the next section.
 
 [^15]: It is also worth noting that the only other covariates that were significant in the regression (given that standard errors were calculated assuming homoskedasticity) besides fixed effects were the coefficients on $\text{GDP}_{ct-2}$ and $\text{Population}_{ct-2}$, which were both significantly positive, though not nearly as high in magnitude as $\hat{\delta}$.
 ```{=latex}
@@ -672,9 +672,9 @@ To assess which (if any) of my proposed cluster-robust variance estimators are a
 ```{=latex}
 \begin{doublespace}
 ```
-The data-generating process will proceed as follows. While it is possible to choose a pre-determined $\beta_0$ vector as other authors have previously done in the literature and generate completely new data according to a similar framework outlined by equations (3) and (4), I wish to simulate data using the same distribution of my sample data in my empirical example. To do this, I will perform a bootstrap sampling of $Y_{ct}$. By leaving my covariates, instrument, and treatment data the same as in the sample data, I will replace the empirical sample $Y_{ct}$ with a new bootstrap sample of $Y_{ct}$, which I will define as $\overset{\circ}{Y}_{ct}$. By running GMM estimation for two-stage least squares for each of the proposed CRVEs, I will assess the long-run empirical rejection rates of the confidence intervals using many iterations (simulations) of $\overset{\circ}{Y}_{ct}$. Mathematically[^16], I will define $\overset{\circ}{Y}_{ct}$ as,
+The data-generating process will proceed as follows. While it is possible to choose a pre-determined $\beta_0$ vector as other authors have previously done in the literature and generate completely new data according to a similar framework outlined by equations (3) and (4), I wish to simulate data using the same distribution of my sample data in my empirical example. To do this, I will perform a bootstrap sampling of $Y_{ct}$. By leaving my covariates, instrument, and treatment data the same as in the sample data, I will replace the empirical sample $Y_{ct}$ with a new bootstrap sample of $Y_{ct}$, which I will define as $\overset{\circ}{Y}_{ct}$. By running GMM estimation for two-stage least squares for each of the proposed CRVEs, I will assess the long-run empirical rejection rates for each of my estimators using many iterations (simulations) of $\overset{\circ}{Y}_{ct}$. Mathematically[^16], I will define $\overset{\circ}{Y}_{ct}$ as,
 
-[^16]: Note, with the probability statement defined as is, this means that each element in $Y_{ct}$ is sampled from a uniform distribution (or, equivalently, sampled with replacement with equal probability).
+[^16]: Note, with the probability statement defined as it is, this means that each element in ${Y}_{ct}$ is sampled with a uniform probability mass (or, equivalently, sampled with replacement with equal probability) to create $\overset{\circ}{Y}_{ct}$.
 ```{=latex}
 \end{doublespace}
 ```
@@ -716,9 +716,9 @@ original.Y + boostrap.Y
 ```{=latex}
 \begin{doublespace}
 ```
-The DGP simulates placebo vectors for $Y_{ct}$ ($\overset{\circ}{Y}_{ct}$). If the results from the main regression were not obtained by random chance, we would expect that $\overset{\circ}{Y}_{ct}$ would testify to this effect. Thus, on average---assuming the standard errors are sized correctly---using a 95% confidence interval, we would expect the empirical rejection of a $\hat{\delta}$ to approach 5% using $\overset{\circ}{Y}_{ct}$ in place of $Y_{ct}$. However, if the results were obtained by some misspecification or some other unobserved factor, it may be that the empirical rejection rate may not converge to 5%, and the GMM variance estimators may fail to deliver on their promise. In such a scenario, we will not be able to put much confidence in the two-stage difference-in-differences regression results. Simultaneously, if we can put our confidence in the regression results, we can also evaluate the empirical performance of the proposed cluster-robust variance estimators and determine which estimator may be preferential in a just-identified GMM setting that uses instrumental variables.
+The DGP simulates placebo vectors for $Y_{ct}$. If the results from the main regression were not obtained by random chance, we would expect that $\overset{\circ}{Y}_{ct}$ would testify to this effect. Thus, on average---assuming the standard errors are sized correctly---using a 95% confidence interval, we would expect the empirical rejection rate of estimators for $\hat{\delta}$ to approach 5% using $\overset{\circ}{Y}_{ct}$ in place of $Y_{ct}$. However, if the results were obtained by some misspecification or some other unobserved factor, it may be that the empirical rejection rate may not converge to 5%, and the GMM variance estimators may fail to deliver on their promise. In such a scenario, we will not be able to put much confidence in the two-stage difference-in-differences regression results. Simultaneously, if we can put our confidence in the regression results, we can also evaluate the empirical performance of the proposed cluster-robust variance estimators and determine which estimator may be preferential in a just-identified GMM setting that uses instrumental variables.
 
-I run 10,000 simulations, generating a new $\overset{\circ}{Y}_{ct}$ for each simulation. I then calculate the estimates for $\delta$ (the local average treatment effect of interest) and the respective 95% confidence intervals using the three proposed CRVEs in Section III as well as the 95% confidence interval using the equation for $\hat{V}$, which assumes a homoskedastic variance on $\epsilon_{ct}$, as a baseline measurement. Notably, to calculate $\overset{iv}{CV}_{2}$ and $\overset{iv}{CV}_{3}$ requires the calculation of $\overset{iv}{M}_{gg}$. In order to calculate this matrix, it is requisite to partial out fixed effects to avoid singularity (MacKinnon et. al, 2022).
+I run 10,000 simulations, generating a new $\overset{\circ}{Y}_{ct}$ for each simulation. I then calculate the estimates for $\delta$ (the local average treatment effect of interest) and the respective 95% confidence intervals using the three proposed CRVEs in Section III as well as the 95% confidence interval using the equation for $\hat{V}$, which assumes a homoskedastic variance on $\epsilon_{ct}$, as a baseline measurement. Notably, calculating $\overset{iv}{CV}_{2}$ and $\overset{iv}{CV}_{3}$ requires the calculation of $\overset{iv}{M}_{gg}$. In order to calculate this matrix, it is requisite to partial out fixed effects to avoid singularity (MacKinnon et. al, 2022).
 ```{=latex}
 \end{doublespace}
 ```
@@ -759,7 +759,7 @@ cat(readLines("CRVE/sim_results.tex"), sep = "\n")
 ```{=latex}
 \begin{doublespace}
 ```
-The results from the Monte Carlo simulation imply that using $\overset{iv}{CV}_{1}$ may be the best cluster-robust variance estimator in just-identified instrumental variables settings. The $\overset{iv}{CV}_{1}$ estimator uses a degrees of freedom correction. This implies that since the empirical rejection rate seems to hover slightly above 5%, the cluster robust variance formula employed by Stata may systematically overestimate the standard errors when the option `cluster` is specified on an `ivregress`[^19]. $\overset{iv}{CV}_{2}$ and $\overset{iv}{CV}_{3}$ seem to routinely under reject. However, it seems that MacKinnon et. al ia also aware of this unique feature of the jackknife estimator. The authors still favor this estimator over the first two alternatives for other reasons, including computational motives. This paper reaffirms this characteristic about $\overset{iv}{CV}_{3}$. It may also be possible that the characteristics seen in the analysis are unique to the data-generating process used or the data itself. More research and analysis may prove beneficial on this front. Additionally, this simulation was performed with $G=64$ (64 unique countries in the analytic sample). It may be possible that the different estimators perform differently under different conditions. Furthermore, when clustering is impractical either via theoretical analysis or empirically infeasible, this study shows that the two-stage least squares estimator (given that assumptions for identification are properly met) seems to work just as fine. Overall, while this paper cannot hope to be the final word of theoretical and empirical work on cluster-robust variance estimators, I do hope this paper has served enforce the credibility of inference employed by influential papers that cluster their standard errors.
+The results from the Monte Carlo simulation imply that using $\overset{iv}{CV}_{1}$ may be the best cluster-robust variance estimator in just-identified instrumental variables settings. The $\overset{iv}{CV}_{1}$ estimator uses a degrees of freedom correction. This implies that since the empirical rejection rate seems to hover slightly above 5%, the cluster robust variance formula employed by Stata may systematically overestimate the standard errors when the option `cluster` is specified on an `ivregress` command[^19]. $\overset{iv}{CV}_{2}$ and $\overset{iv}{CV}_{3}$ seem to routinely under reject. However, it seems that MacKinnon et. al are also aware of this unique feature of the jackknife estimator. The authors still favor this estimator over the first two alternatives for other reasons, including computational motives. This paper reaffirms this characteristic about $\overset{iv}{CV}_{3}$. It may also be possible that the characteristics seen in the analysis are unique to the data-generating process used or the data itself. More research and analysis may prove beneficial on this front. Additionally, this simulation was performed with $G=64$ (64 unique countries in the analytic sample). It may be possible that the different estimators perform differently under different conditions. Furthermore, when clustering is impractical either via theoretical analysis or empirically infeasible, this study shows that the two-stage least squares estimator (given that assumptions for identification are properly met) seems to work just as fine. Overall, while this paper cannot hope to be the final word of theoretical and empirical work on cluster-robust variance estimators, I do hope this paper has served to enforce the credibility of inference employed by influential papers that cluster their standard errors.
 
 Finally, this analysis adds credibility to the empirical findings of the applied example presented in this paper. The results of the Monte Carlo analysis imply that the test used to evaluate whether $\hat{\delta}$ is significant seems appropriately sized. Given that electing higher proportions of women in national legislatures in African and Arab countries truly has no effect on yearly per capita $CO_2$ emissions, using $\overset{iv}{CV}_{1}$[^18], there is 0.021% chance (p-value < 0.001) that we would observe an effect as large or larger by random. Given these results, we can (confidently) reaffirm the effect found by Mavisakalyan and Tarverdi. While the exact mechanism through which women's
 presence influences climate policy remains open for further
