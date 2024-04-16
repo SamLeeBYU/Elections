@@ -191,7 +191,7 @@ covariates alone are not enough to explain a country's development and
 how it interacts with how women are elected into national legislatures.
 The rate at which a country develops, both industrially and politically,
 in regards to the countries in this study may be highly related to which
-European power originally occupied the territory and thus, how the power
+European power previously occupied the territory and thus, how the power
 left the state when the occupation ceased, including the political
 institution(s) established. Endogeneity may also arise in what natural
 resources are available to the country at year $t$. Countries with a
@@ -302,7 +302,7 @@ country and yearly fixed effects) I include in equations (1) and (2).
 This could be violated if countries whose governments are established
 after colonial rule have (i) strong dependencies on the formal colonial
 power in terms of institutional structure and (ii) as a function of that
-institutional structure relies on carbon-intensive resources to kick
+institutional structure rely on carbon-intensive resources to kick
 start its economy in post-colonial development. In other words, the
 instrument will be invalid if there are interactions between time,
 country, and carbon emissions. More research needs to be done to see if
@@ -427,7 +427,7 @@ this placebo regression is to reason that there is a signal in the
 treatment on per capita $CO_2$ emissions. If the gender composition of national
 legislatures isn't influencing the number of natural disasters that
 occur within a country, this supports the theory that I did not obtain
-the regression results in the original regression by random chance.
+the regression results in the original regression by random chance---this would provide supporting evidence that hypotheses tests on $\hat{delta}$ are appropriately sized.
 Indeed, after running my regression, the placebo regression results
 support this. See Table 4 in the Appendix.
 
