@@ -60,7 +60,7 @@ The code to reproduce the Monte Carlo analysis (Table 4 in [Simulation.pdf](Simu
 Rscript CRVE/main.R
 ```
 
-This script loads in [setup.R](setup.R), [DGP.R](CRVE/DGP.R), [regression.R](CRVE/regression.R), [simulate.R](CRVE/simulate.R), runs the simulation 10,000 times (this can be changed) by calling the data-generating function to generate a new response variable (Y), and then estimates $\delta$ and standard errors for $\delta$ using the proposed cluster-robust variance estimators as discussed in the paper. It saves the simulated results to an [RData object](CRVE/sims.RData), calculates the empirical rejection rate, and then formats everything into a latex table as seen in Table 4 (formatted latex results are saved in [sim-results.tex](CRVE/sim-results.tex)). A set seed is set in [main.R](CRVE/main.R) to yield the same results every run through.
+This script loads in [setup.R](setup.R), [DGP.R](CRVE/DGP.R), [regression.R](CRVE/regression.R), [simulate.R](CRVE/simulate.R), runs the simulation 10,000 times (this can be changed) by calling the data-generating function to generate a new response variable (Y), and then estimates $\delta$ and standard errors for $\delta$ using the proposed cluster-robust variance estimators as discussed in the paper. It saves the simulated results to an [RData object](CRVE/sims.RData), calculates the empirical rejection rate, and then formats everything into a latex table as seen in Table 4 (formatted latex results are saved in [sim-results.tex](CRVE/sim-results.tex)). A seed is set in [main.R](CRVE/main.R) to yield the same results every run through.
 
 ---
 
