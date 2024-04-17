@@ -20,6 +20,8 @@ library(expm)
 library(ivreg)
 library(sandwich)
 
+set.seed(04142024)
+
 #Load in the data matrices for the applied example
 source("CRVE/setup.R")
 #Load in cluster robust formula
@@ -679,7 +681,7 @@ The data-generating process will proceed as follows. While it is possible to cho
 \end{doublespace}
 ```
 $$
-\overset{\circ}{Y}_{ct}=\left\{\overset{\circ}{y_{ct}}\right\}_{c=\text{Angola, } t=1999}^{c=\text{Zimbabwe, t=2022}}=\left\{ \overset{\circ}{y_{\text{Angola, } 1999}}, \overset{\circ}{y_{\text{Angola, } 2000}}...,\overset{\circ}{y_{\text{Zimbabwe, } 2022}} \right\}
+\overset{\circ}{Y}_{ct}=\left\{\overset{\circ}{y_{ct}}\right\}_{c=\text{Angola, } t=1999}^{c=\text{Zimbabwe, t=2022}}=\left\{ \overset{\circ}{y_{\text{Angola, } 1999}}, \overset{\circ}{y_{\text{Angola, } 2000}},...,\overset{\circ}{y_{\text{Zimbabwe, } 2022}} \right\}
 $$
 $$
 Pr\left( \overset{\circ}{y}_{ct} = y_{ct} \right) = \frac{1}{n}, \quad \forall c,t
@@ -724,15 +726,6 @@ I run 10,000 simulations, generating a new $\overset{\circ}{Y}_{ct}$ for each si
 ```
 ## Simulation Results
 ```{r simulation, echo=F, fig.width=14, fig.height=8}
-# library(xtable)
-#Run simulation
-# sims <- simulate.CRVE(10000, Y.tilde, clusters, bootstrap.cluster = F)
-# #Format table to latex
-# sims.table <- xtable(sims)
-# rejection(sims)
-
-#save(sims, file="CRVE/sims.RData")
-
 load("CRVE/sims.RData")
 
 sims.delta <- data.frame(x=sapply(sims[,1]+sims[,2], median)) %>%
@@ -753,7 +746,7 @@ sims.delta <- data.frame(x=sapply(sims[,1]+sims[,2], median)) %>%
 sims.delta
 ```
 ```{r sim-results, fig.align='center', echo=F, warning=F, results='asis'}
-cat(readLines("CRVE/sim_results.tex"), sep = "\n")
+cat(readLines("CRVE/sim-results.tex"), sep = "\n")
 ```
 # VI. Implications and Conclusion
 ```{=latex}

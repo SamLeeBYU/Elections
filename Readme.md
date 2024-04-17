@@ -4,17 +4,19 @@ subtitle: "Can Electing More Women into Office Narrow the Climate Divide?"
 author: "Sam Lee"
 ---
 
-# Introduction
+# (1) Applied Analysis
+
+## Introduction
 
 I seek to identify the causal effect that electing higher proportions of women in national legislatures in African and Arab nations has on yearly per capita $CO_2$ emissions. I utilize a two-stage difference-in-difference approach on 64 different countries throughout Africa and the Middle-East from 1998-2022. To eliminate the potential endogeneity in using the proportion of women in national legislature as a treatment on per capita $CO_2$ emissions, I use years since women were granted suffrage in each respective country as an instrumental variable. One nominal paper in the literature has shown evidence that increased proportions of women in parliaments is more than likely causally related to stricter climate policies (Mavisakalyan & Tarverdi, 2019). However, this paper does not take into account how carbon emissions and women in government have evolved over time. To my knowledge, little research has been done to show a causal link between women in parliaments and its effects on climate *over time*. I expand on this research by showing how carbon emissions have changed over time to elicit a local average treatment effect between changes in gender compositions at the national legislature level. When the average proportion of women in national legislatures in African and Arab countries increase by 1%, I find a significant effect that total yearly (gigatons of) $CO_2$ emissions per capita decrease by 1.08 (-1.64, -0.51), on average. To enforce the credibility of significance, I run a placebo regression, using the number of natural disasters (as classified and recorded by the Centre for Research on the Epidemiology of Disasters) that occur within a country at a particular year as an effective placebo.
 
+The results of the applied analysis are discussed in [Report.pdf](Report.pdf).
+
 ---
 
-The results of this paper are discussed in [Report.pdf](Report.pdf)
+# Reproduce Empirical Results
 
-# Reproduce Results
-
-1) Clone the Repository (Download the files)
+1) Clone the Repository (Download the Files)
 
 For git users:
 - Run the following command in your directory of choice
@@ -34,6 +36,33 @@ cd Elections
 do Scripts/analysis.do
 ```
 - This will run [DataWrangle.do](Scripts/DataWrangle.do) first, which merges in all the raw files and prepares an analytical sample for analysis. This will also save the regression results into [regression_results_raw.tex](regression_results_raw.tex) and the placebo results into [placebo_results_raw.tex](placebo_results_raw.tex) after running [placebo.do](Scripts/placebo.do), which the script will also call simultaneously.
+
+---
+
+# (2) Cluster Robust Variance Estimators for Instrumental Variables and Monte Carlo Analysis
+
+## Introduction
+
+The theoretical portion of this project assesses the asymptotic properties of cluster-robust variance estimators (CRVEs) in a GMM framework for instrumental variables. I use the data from the applied example of examining of what the effect of electing higher proportions of women in African and Arab nations has on yearly $CO_2$ emissions per capita using years since suffrage as an instrumental variable. I discuss three feasible CRVEs proposed in the literature and use the empirical example to illustrate the long-run rejection rates of the CRVEs. The data-generating process, estimation using GMM, and implications for cluster-robust variance estimators are also discussed. The paper includes a Monte Carlo analysis to evaluate the performance of the CRVEs, with implications for the findings from the applied example. The paper aims to assess the reliability of the inference drawn from the empirical analysis.
+
+The findings for the theoretical paper are discussed in detail in [Simulation.pdf](Simulation.pdf)
+
+---
+
+# Reproduce Monte Carlo Results
+
+The code to reproduce the Monte Carlo analysis (Table 4 in [Simulation.pdf](Simulation.pdf)) was written in R. This includes the functions written for the proposed cluster robust variance estimators as defined in the paper. All regression calculations were done using matrix algebra. All R code can be found in the [CRVE](CRVE/) directory.
+
+1) Run [main.R](CRVE/main.R)
+
+(in the terminal)
+```
+Rscript CRVE/main.R
+```
+
+This script loads in [setup.R](setup.R), [DGP.R](CRVE/DGP.R), [regression.R](CRVE/regression.R), [simulate.R](CRVE/simulate.R), runs the simulation 10,000 times (this can be changed) by calling the data-generating function to generate a new response variable (Y), and then estimates $\delta$ and standard errors for $\delta$ using the proposed cluster-robust variance estimators as discussed in the paper. It saves the simulated results to an [RData object](CRVE/sims.RData), calculates the empirical rejection rate, and then formats everything into a latex table as seen in Table 4 (formatted latex results are saved in [sim-results.tex](CRVE/sim-results.tex)). A set seed is set in [main.R](CRVE/main.R) to yield the same results every run through.
+
+---
 
 # Data
 
@@ -69,7 +98,6 @@ This data was directly (and publicly) downloaded from the World Bank's Open Data
 
 This is the final wrangled, cleaned data file saved by [DataWrangle.do](Scripts/DataWrangle.do) (in .csv format--there's an equivalent file with .dta extension). This file is then pulled into [analysis.do](Scripts/analysis.do) and [placebo.do](Scripts/analysis.do) for appropriate regression analysis.
 
-
 Note: All other files with the .dta extension are simply the cleaned or processed files by [DataWrangle.do](Scripts/DataWrangle.do).
 
 ---
@@ -82,7 +110,7 @@ This script reads in all the raw data files (IPU.csv, emissions.csv, disasters.x
 
 #### [analysis.do](Scripts/analysis.do)
 
-This script runs [DataWrangle.do](Scripts/DataWrangle.do) to read in the analytic sample, and prepares a few more things for the analysis such as logging GDP and population, lagging covariates, creating saturated dummies for country-specific and year-specific fixed effects, and dropping colinear terms. This script also runs the main regression for identification (a two-stage difference-in-differences) and saves the results to [regression_results_raw.tex](regression_results_raw.tex) (although, I format the latex into a nicer formatted [regression_results.tex](regression_results.tex)). Finally, this script calls [placebo.do](Scripts/placebo.do). Extensive documentation is also available in this Stata file.
+This script runs [DataWrangle.do](Scripts/DataWrangle.do) to read in the analytic sample, and prepares a few more things for the analysis such as logging GDP and population, lagging covariates, creating saturated dummies for country-specific and year-specific fixed effects, and dropping colinear terms. This script saves the regression matrix (with fixed effects, lags, etc.) to [regression_matrix.dta](Data/regression_matrix.dta). This script also runs the main regression for identification (a two-stage difference-in-differences) and saves the results to [regression_results_raw.tex](regression_results_raw.tex) (although, I format the latex into a nicer formatted [regression_results.tex](regression_results.tex)). Finally, this script calls [placebo.do](Scripts/placebo.do). Extensive documentation is also available in this Stata file.
 
 #### [co2_scraper.py](Scripts/co2_scraper.py)
 
@@ -98,15 +126,53 @@ This script is extremely similar to [co2_scraper.py](Scripts/co2_scraper.py) in 
 
 #### [placebo.do](Scripts/placebo.do)
 
-This script is called by [analysis.do](Scripts/analysis.do), but can also be ran independently. This script performs the placebo regression discussed in the [Report.pdf](Report.pdf). This script merges the cleaned disasters data (prepared by [DataWrangle.do](Scripts/DataWrangle.do)) and runs the same (two-stage difference-in-differences) regression in [analysis.do](Scripts/analysis.do), but replaces $CO_2$ emissions per capita with the number of natural disasters. Finally, this script saves the results to [placebo_results_raw.tex](placebo_results_raw.tex).
+This script is called by [analysis.do](Scripts/analysis.do), but can also be ran independently. This script performs the placebo regression discussed in the [Report.pdf](Report.pdf). This script merges the cleaned disasters data (prepared by [DataWrangle.do](Scripts/DataWrangle.do)) and runs the same (two-stage difference-in-differences) regression in [analysis.do](Scripts/analysis.do), but replaces $CO_2$ emissions per capita with the number of natural disasters. This script saves the regression matrix (with fixed effects, lags, etc.) to [disasters_regression_matrix.dta](Data/disasters_regression_matrix.dta). Finally, this script saves the results to [placebo_results_raw.tex](placebo_results_raw.tex).
 
 #### [regions_scraper.py](Scripts/regions_scraper.py)
 
 This is a static web-scraping script that reads in the HTML from the U.S. Department of State's website ([https://www.state.gov/countries-and-areas-list/](https://www.state.gov/countries-and-areas-list/)), and formats it into a nicely arrayed csv called [regions.csv](Data/regions.csv). This is what defines what I count as either an African or Arab nation.
 
+## Scripts for Monte Carlo Analysis & Theoretical Paper
+
+#### [cluster.robust.R](CRVE/cluster.robust.R)
+
+This script defines a function to evaluate the proposed formulas for the cluster robust variance estimators in R. The function returns a 95% confidence interval on the estimated $\delta$ (presumed to be the first column of $X$).
+
+#### [DGP.R](CRVE/DGP.R)
+
+This script defines a function to generate new values of the response variable given the data-generating process defined in the paper.
+
+#### [regression.R](CRVE/regression.R)
+
+This script defines two functions, one for instrumental variables and one for OLS. These functions calculate the coefficient estimates and standard errors using matrix algebra and standard GMM theory. My IV function assumes homoskedasticity. OLS can be calculated either with homoskedastic or robust standard errors.
+
+#### [setup.R](CRVE/setup.R)
+
+This script loads in the data from Stata used in the applied example (see [analysis.do](Scripts/analysis.do)), partials out the fixed effects, and prepares empirical X and Y matrices used by the other R scripts in this analysis.
+
+#### [simulate.R](CRVE/simulate.R)
+
+This script contains three functions:
+
+1) *simulate.CRVE* - This function runs the Monte Carlo analysis $n$ times (drawing new vectors for $Y$ $n$ times). It takes a vector $Y$ as an argument--this is the vector that is replaced (or sampled from to be replaced) in the DGP. It also takes *clusters* as an argument, which specify the cluster indices (a vector for where the clusters are located and how many observations are in each cluster); this argument is defined in [setup.R](CRVE/setup.R). The function outputs a matrix, where each set of two rows is the (2.5%, 97.%) C.I. surrounding the estimate for $\delta$ for that specific generation.
+
+2) *rejection* - Given a matrix of simulations (given by the output of *simulate.CRVE*), calculates the empirical rejection rates of each of the variance estimators. Outputs a named vector.
+
+3) *to_latex* - Given a matrix of simulations (given by the output of *simulate.CRVE*), formats the matrix into a nicely organized latex table for display (saved to [sim-results.tex](CRVE/sim-results.tex)). This function also saves the simulation matrix to an external RData object ([sims.RData](CRVE/sims.RData)).
+
+#### [main.R](CRVE/main.R)
+
+This script loads in all the scripts above and runs the Monte Carlo analysis. It sets a seed for exact replication. It make take about 10 minutes to run. It saves the results to a latex table using *to_latex(.)* from [simulate.R](CRVE/simulate.R).
+
+---
+
 # References
 
-Bertrand, M., Duflo, E., & Mullainathan, S. (2004). How much should we trust differences-in-differences estimates? [https://www.nber.org/system/files/working_papers/w31063/w31063.pdf](https://www.nber.org/system/files/working_papers/w31063/w31063.pdf)
+Bertrand, M., Duflo, E., & Mullainathan, S. (2004). How much should we
+trust differences-in-differences estimates?
+<https://www.jstor.org/stable/25098683>
+
+Bell, R.M.m McCaffrey, D.F., (2002). Bias reduction in standard errors for linear regression with multi-stage samples. Surv. Methodol. 28, 169-181.
 
 Centre for Research on the Epidemiology of Disasters (CRED). (2023). EM-DAT: The Emergency Events Database [database]. Retrieved [03.29.2024], from [https://www.emdat.be/](https://www.emdat.be/)
 
@@ -119,6 +185,8 @@ Grier, R., & Maldonado, B. (2015). Electoral experience, institutional quality, 
 Hicks, D. L., Hicks, J. H., & Maldonado, B. (2016). Women as policy makers and donors: Female legislators and foreign aid. European Journal of Political Economy, 44(2), 118-135. doi: 10.1016/j.europoleco.2015.12.004
 
 Inter-Parliamentary Union (IPU). (n.d.). Women in national parliaments. [Data set]. Retrieved from [https://data.ipu.org/womon-ranking](https://data.ipu.org/womon-ranking)
+
+MacKinnon, J. G., Nielsen, M. Ø., & Webb, M. D. (2023). Cluster-robust inference: A guide to empirical practice. Journal of Econometrics, 47(4), 414–4561
 
 Mavisakalyan, A., & Tarverdi, Y. (2019). Gender and climate change: Do female parliamentarians make a difference? Global Labor Organization (GLO) Discussion Paper No. 221. [https://www.sciencedirect.com/science/article/pii/S0176268017304500](https://www.sciencedirect.com/science/article/pii/S0176268017304500)
 

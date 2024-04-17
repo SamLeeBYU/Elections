@@ -34,3 +34,45 @@ rejection <- function(sims){
     unique()
   return(rejections)
 }
+
+#Return the results as a a table as seen in Table 4
+to_latex <- function(sims, save=F){
+  if(save){
+    #Save the simulations as a R data object to be used later
+    save(sims, file="CRVE/sims.RData")
+  }
+  
+  latex.table <- paste("\\begin{table}[ht]",
+                       "  \\caption{Simulation Results: Two Stage Difference-in-Difference Regression Results of $\\hat{\\delta}$}",
+                       "  \\centering",
+                       "  \\begin{tabular}{rrrrrrrrr}",
+                       "      \\hline",
+                       "      &\\multicolumn{2}{c}{$\\overset{iv}{CV}_{1}$} &\\multicolumn{2}{c}{$\\overset{iv}{CV}_{2}$} &\\multicolumn{2}{c}{$\\overset{iv}{CV}_{3}$} &\\multicolumn{2}{c}{2SLS} \\\\",
+                       "      &\\multicolumn{2}{c}{(2.5\\%, 97.5\\%)} &\\multicolumn{2}{c}{(2.5\\%, 97.5\\%)} &\\multicolumn{2}{c}{(2.5\\%, 97.5\\%)} &\\multicolumn{2}{c}{(2.5\\%, 97.5\\%)}\\\\",
+                       "      \\hline",
+                       sep = "\n")
+  data <- c()
+  for(i in 0:15){
+    if(i > 10){
+      j <- 9995+(i-10)
+    } else {
+      j <- i+1
+    }
+    if(i == 10){
+      content <- str_c("...", " & ", paste0(rep("...", 8), collapse = " & "))
+    } else {
+      content <- str_c(j, " & ", paste0(round(sims[j,],2), collapse = " & "))
+    }
+    row <- str_c("      ", content, " \\\\")
+    data <- c(data, row)
+  }
+  data <- c(data, "      \\hline")
+  rejection.rates <- rejection(sims)
+  rejection.rates.row <- c(str_c("      ", "Empirical Rejection & ", 
+                               paste(c(str_c("\\multicolumn{2}{c}{", rejection.rates[1:3], "} & "),
+                                       str_c("\\multicolumn{2}{c}{", rejection.rates[4], "} ")), collapse = ""),
+                               "\\\\") , "      \\hline")
+  table.end <- c("    \\end{tabular}", "\\end{table}")
+  latex.table <- c(latex.table, data, rejection.rates.row, table.end)
+  return(paste(latex.table, sep="\n"))
+}
